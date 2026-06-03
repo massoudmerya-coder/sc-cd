@@ -103,10 +103,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
   </div>
   <div class="pin-error" id="pin-error"></div>
   <div class="pin-cfg" id="cfg-area" style="display:none">
-    <div class="pin-cfg-title">First time — configure your access</div>
-    <input id="cfg-bin" type="text" placeholder="JSONBin Bin ID (e.g. 6650a3f1...)">
-    <input id="cfg-pin" type="tel" placeholder="Choose a 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
-    <button onclick="saveCfg()">Save & continue</button>
+    <div class="pin-cfg-title">Choose your secret PIN</div>
+    <input id="cfg-pin" type="number" placeholder="4-digit PIN e.g. 1234" maxlength="4" inputmode="numeric">
+    <button onclick="(function(){
+      var p=String(document.getElementById('cfg-pin').value).trim();
+      if(p.length!==4){alert('PIN must be exactly 4 digits');return;}
+      localStorage.setItem('soukhour_own',JSON.stringify({pin:p}));
+      document.getElementById('cfg-area').style.display='none';
+      document.getElementById('pin-error').textContent='PIN saved! Enter it above.';
+    })()" style="width:100%;padding:14px;background:#8a6a1e;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px;-webkit-appearance:none">Set PIN</button>
   </div>
 </div>
 
@@ -174,9 +179,9 @@ function dots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.tog
 
 function psub(){
   const c=gcfg();
-  if(!c.bin||!c.pin){
+  if(!c.pin){
     document.getElementById('cfg-area').style.display='block';
-    document.getElementById('pin-error').textContent='Set up your config below first.';
+    document.getElementById('pin-error').textContent='Set your PIN below first.';
     pinEntered='';dots();return;
   }
   if(pinEntered===c.pin){
@@ -209,11 +214,15 @@ function logout(){
 }
 
 // ── DATA ──
+const MASTER_BIN='6a1ffe1bf5f4af5e29b1ae20';
+const MASTER_KEY='$2a$10$sF387k3CmujZ5Bqho4yOSOjfMOP5gs0btP/P1.lMKL6p7bghlQRs2';
+
 async function loadData(){
-  const c=gcfg();if(!c.bin)return;
   document.getElementById('last-sync').textContent='Loading…';
   try{
-    const r=await fetch(`https://api.jsonbin.io/v3/b/${c.bin}/latest`);
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${MASTER_BIN}/latest`,{
+      headers:{'X-Master-Key':MASTER_KEY}
+    });
     if(!r.ok)throw new Error('fetch failed');
     const j=await r.json();
     rem=j.record||{};
@@ -324,7 +333,7 @@ function tab(name){
 
 // ── INIT ──
 const _c=gcfg();
-if(!_c.bin||!_c.pin)document.getElementById('cfg-area').style.display='block';
+if(!_c.pin)document.getElementById('cfg-area').style.display='block';
 tickH();setInterval(tickH,30000);
 </script>
 </body>
