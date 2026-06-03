@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🎯 Soukhour Owner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f7f6f3;--bg2:#ffffff;--bg3:#f0efe9;--border:#e2e0d8;
+  --text:#1a1916;--text2:#6b6860;--text3:#a8a49a;
+  --gold:#8a6a1e;--gold-bg:#fdf3dc;--gold-border:#e8c96a;
+  --green:#1e7a46;--green-bg:#e8f7ee;--green-border:#a8dfc0;
+  --red:#c0392b;--red-bg:#fdecea;--red-border:#f0b0a8;
+  --amber:#8a5a00;--amber-bg:#fff4e0;--amber-border:#f0cc80;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+#pin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 16px}
+.pin-logo{font-size:36px;margin-bottom:6px}
+.pin-title{font-size:22px;font-weight:700;color:var(--gold);margin-bottom:3px}
+.pin-sub{font-size:13px;color:var(--text3);margin-bottom:28px;text-align:center}
+.pin-dots{display:flex;gap:16px;margin-bottom:28px}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);background:var(--bg3);transition:background .15s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:260px}
+.pin-key{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;font-size:24px;font-weight:600;text-align:center;cursor:pointer;box-shadow:var(--shadow);transition:all .1s;user-select:none;-webkit-tap-highlight-color:transparent}
+.pin-key:active{transform:scale(.92);background:var(--bg3)}
+.pin-error{color:var(--red);font-size:13px;margin-top:10px;min-height:20px;text-align:center}
+.pin-cfg{margin-top:24px;width:100%;max-width:300px}
+.pin-cfg-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-align:center;text-transform:uppercase;letter-spacing:.06em}
+.pin-cfg input{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;width:100%;margin-bottom:8px;display:block;background:var(--bg2);color:var(--text)}
+.pin-cfg button{width:100%;padding:12px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer}
+#main-screen{display:none;padding:16px;max-width:480px;margin:0 auto;padding-bottom:76px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:6px}
+.header-title{font-size:17px;font-weight:700;color:var(--gold)}
+.header-time{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:1px}
+.refresh-btn{background:var(--gold);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.last-sync{text-align:center;font-size:11px;color:var(--text3);margin-bottom:10px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;box-shadow:var(--shadow)}
+.metric.full{grid-column:1/3}
+.metric.gold{background:var(--gold-bg);border-color:var(--gold-border)}
+.metric.green{background:var(--green-bg);border-color:var(--green-border)}
+.metric.red{background:var(--red-bg);border-color:var(--red-border)}
+.metric.amber{background:var(--amber-bg);border-color:var(--amber-border)}
+.m-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:4px}
+.m-value{font-size:24px;font-weight:700;font-family:'DM Mono',monospace}
+.metric.gold .m-value{color:var(--gold)}
+.metric.green .m-value{color:var(--green)}
+.metric.red .m-value{color:var(--red)}
+.metric.amber .m-value{color:var(--amber)}
+.m-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:12px;box-shadow:var(--shadow)}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:10px}
+.sess-row{padding:9px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sess-row:last-child{border-bottom:none}
+.sess-name{font-weight:600;font-size:14px}
+.sess-detail{font-size:12px;color:var(--text2);margin-top:2px}
+.sess-amount{font-weight:700;font-family:'DM Mono',monospace;color:var(--gold);text-align:right;flex-shrink:0;font-size:15px}
+.sess-pay{font-size:11px;color:var(--text2);text-align:right}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.bar-label{width:90px;color:var(--text2);text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:7px;background:var(--bg3);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:99px;background:var(--gold)}
+.bar-val{width:40px;font-family:'DM Mono',monospace;font-weight:600;text-align:right;font-size:11px}
+.stock-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stock-item:last-child{border-bottom:none}
+.stock-qty{font-family:'DM Mono',monospace;font-weight:700;font-size:18px}
+.ok{color:var(--green)}.low{color:var(--amber)}.out{color:var(--red)}
+.pending-row{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pending-row:last-child{border-bottom:none}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.08);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bnav-item{flex:1;padding:10px 4px 8px;text-align:center;cursor:pointer;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);-webkit-tap-highlight-color:transparent}
+.bnav-item.active{color:var(--gold)}
+.bnav-icon{font-size:22px;display:block;margin-bottom:1px}
+.tab{display:none}.tab.active{display:block}
+.empty-msg{color:#aaa;font-size:13px;padding:8px 0}
+.logout-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text3);cursor:pointer;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div id="pin-screen">
+  <div class="pin-logo">🎯</div>
+  <div class="pin-title">Soukhour Owner</div>
+  <div class="pin-sub">Private dashboard — enter your PIN</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-pad">
+    <div class="pin-key" onclick="pk('1')">1</div><div class="pin-key" onclick="pk('2')">2</div><div class="pin-key" onclick="pk('3')">3</div>
+    <div class="pin-key" onclick="pk('4')">4</div><div class="pin-key" onclick="pk('5')">5</div><div class="pin-key" onclick="pk('6')">6</div>
+    <div class="pin-key" onclick="pk('7')">7</div><div class="pin-key" onclick="pk('8')">8</div><div class="pin-key" onclick="pk('9')">9</div>
+    <div class="pin-key" onclick="pdel()" style="font-size:18px;color:var(--text2)">⌫</div>
+    <div class="pin-key" onclick="pk('0')">0</div>
+    <div class="pin-key" style="background:var(--gold-bg);color:var(--gold)" onclick="psub()">→</div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-cfg" id="cfg-area" style="display:none">
+    <div class="pin-cfg-title">First time — configure your access</div>
+    <input id="cfg-bin" type="text" placeholder="JSONBin Bin ID (e.g. 6650a3f1...)">
+    <input id="cfg-pin" type="tel" placeholder="Choose a 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+    <button onclick="saveCfg()">Save & continue</button>
+  </div>
+</div>
+
+<div id="main-screen">
+  <div class="header">
+    <div>
+      <div class="header-title">🎯 Owner Dashboard</div>
+      <div class="header-time" id="hdr-time"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="refresh-btn" onclick="loadData()">↻</button>
+      <button class="logout-btn" onclick="logout()">Lock</button>
+    </div>
+  </div>
+  <div class="last-sync" id="last-sync"></div>
+
+  <div class="tab active" id="tab-today">
+    <div class="metrics" id="today-metrics"></div>
+    <div class="section"><div class="section-title">Today's sessions</div><div id="today-sessions"></div></div>
+    <div class="section"><div class="section-title">All unpaid sessions</div><div id="pending-list"></div></div>
+  </div>
+
+  <div class="tab" id="tab-month">
+    <div class="metrics" id="month-metrics"></div>
+    <div class="section"><div class="section-title">Revenue by service — this month</div><div id="month-bars"></div></div>
+    <div class="section"><div class="section-title">Expenses this month</div><div id="month-expenses"></div></div>
+  </div>
+
+  <div class="tab" id="tab-alltime">
+    <div class="metrics" id="alltime-metrics"></div>
+    <div class="section"><div class="section-title">All-time by service</div><div id="alltime-bars"></div></div>
+    <div class="section"><div class="section-title">Monthly trend</div><div id="monthly-trend"></div></div>
+    <div class="section"><div class="section-title">Top customers</div><div id="top-customers"></div></div>
+  </div>
+
+  <div class="tab" id="tab-stock">
+    <div class="section"><div class="section-title">Ammunition stock</div><div id="stock-list"></div></div>
+    <div class="section"><div class="section-title">Members <span id="mem-badge"></span></div><div id="members-list"></div></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item active" id="bn-today" onclick="tab('today')"><span class="bnav-icon">◈</span>Today</div>
+    <div class="bnav-item" id="bn-month" onclick="tab('month')"><span class="bnav-icon">◐</span>Month</div>
+    <div class="bnav-item" id="bn-alltime" onclick="tab('alltime')"><span class="bnav-icon">◑</span>All time</div>
+    <div class="bnav-item" id="bn-stock" onclick="tab('stock')"><span class="bnav-icon">▦</span>Stock</div>
+  </div>
+</div>
+
+<script>
+const CK='soukhour_own';
+let rem={sessions:[],customers:[],expenses:[],stock:[]};
+let pinEntered='';
+
+function gcfg(){try{return JSON.parse(localStorage.getItem(CK)||'{}');}catch(e){return{};}}
+function scfg(c){localStorage.setItem(CK,JSON.stringify(c));}
+
+// ── PIN ──
+function pk(d){
+  if(pinEntered.length>=4)return;
+  pinEntered+=d;dots();
+  if(pinEntered.length===4)setTimeout(psub,150);
+}
+function pdel(){pinEntered=pinEntered.slice(0,-1);dots();document.getElementById('pin-error').textContent='';}
+function dots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pinEntered.length);}
+
+function psub(){
+  const c=gcfg();
+  if(!c.bin||!c.pin){
+    document.getElementById('cfg-area').style.display='block';
+    document.getElementById('pin-error').textContent='Set up your config below first.';
+    pinEntered='';dots();return;
+  }
+  if(pinEntered===c.pin){
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('main-screen').style.display='block';
+    loadData();
+    setInterval(loadData,60000);
+    setInterval(tickH,15000);tickH();
+  } else {
+    document.getElementById('pin-error').textContent='Wrong PIN — try again.';
+    pinEntered='';dots();
+  }
+}
+
+function saveCfg(){
+  const bin=document.getElementById('cfg-bin').value.trim();
+  const pin=document.getElementById('cfg-pin').value.trim();
+  if(!bin){alert('Paste your JSONBin Bin ID.');return;}
+  if(pin.length!==4||isNaN(pin)){alert('PIN must be exactly 4 digits.');return;}
+  scfg({bin,pin});
+  document.getElementById('cfg-area').style.display='none';
+  document.getElementById('pin-error').textContent='Saved! Now enter your PIN above.';
+  pinEntered='';dots();
+}
+
+function logout(){
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('pin-screen').style.display='flex';
+  pinEntered='';dots();
+}
+
+// ── DATA ──
+async function loadData(){
+  const c=gcfg();if(!c.bin)return;
+  document.getElementById('last-sync').textContent='Loading…';
+  try{
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${c.bin}/latest`);
+    if(!r.ok)throw new Error('fetch failed');
+    const j=await r.json();
+    rem=j.record||{};
+    rem.sessions=rem.sessions||[];
+    rem.customers=rem.customers||[];
+    rem.expenses=rem.expenses||[];
+    rem.stock=rem.stock||[];
+    const t=rem.ts?new Date(rem.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'–';
+    document.getElementById('last-sync').textContent='Last update from PC: '+t;
+    renderAll();
+  }catch(e){
+    document.getElementById('last-sync').textContent='⚠ Could not load — check internet or Bin ID';
+  }
+}
+
+function tickH(){
+  const n=new Date();
+  const el=document.getElementById('hdr-time');
+  if(el)el.textContent=n.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'})+' · '+n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+function f$(n){return'$'+Number(n||0).toFixed(0);}
+function fd(d){if(!d)return'–';return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
+function tod(){return new Date().toISOString().slice(0,10);}
+function thm(){return new Date().toISOString().slice(0,7);}
+function summ(s){return(s.items||[]).map(i=>(i.qty>1?i.qty+'× ':'')+i.service).join(', ');}
+function pay(p){return p==='Pending / unpaid'?'<span style="color:var(--amber);font-size:11px;font-weight:700">⚠ Unpaid</span>':'<span style="color:var(--green);font-size:11px">✓ '+p+'</span>';}
+
+function renderAll(){renderToday();renderMonth();renderAllTime();renderStock();}
+
+function renderToday(){
+  const ts=rem.sessions.filter(s=>s.date===tod()&&s.status!=='Cancelled');
+  const tr=ts.reduce((a,s)=>a+Number(s.net||0),0);
+  const tp=ts.filter(s=>s.payment!=='Pending / unpaid').reduce((a,s)=>a+Number(s.net||0),0);
+  const ap=rem.sessions.filter(s=>s.payment==='Pending / unpaid'&&s.status!=='Cancelled');
+  const apa=ap.reduce((a,s)=>a+Number(s.net||0),0);
+  document.getElementById('today-metrics').innerHTML=`
+    <div class="metric gold"><div class="m-label">Today revenue</div><div class="m-value">${f$(tr)}</div><div class="m-sub">${ts.length} session${ts.length!==1?'s':''}</div></div>
+    <div class="metric green"><div class="m-label">Collected today</div><div class="m-value">${f$(tp)}</div></div>
+    <div class="metric amber full"><div class="m-label">Total unpaid (all time)</div><div class="m-value">${f$(apa)}</div><div class="m-sub">${ap.length} session${ap.length!==1?'s':''} pending</div></div>`;
+  const tl=document.getElementById('today-sessions');
+  tl.innerHTML=ts.length?[...ts].reverse().map(s=>`<div class="sess-row"><div><div class="sess-name">${s.name}</div><div class="sess-detail">${s.time||''} · ${summ(s)}</div><div style="margin-top:3px">${pay(s.payment)}</div></div><div><div class="sess-amount">${f$(s.net)}</div>${s.discount>0?`<div class="sess-pay" style="color:var(--red)">-${f$(s.discount)} disc</div>`:''}</div></div>`).join(''):'<div class="empty-msg">No sessions today yet</div>';
+  const pl=document.getElementById('pending-list');
+  pl.innerHTML=ap.length?[...ap].reverse().slice(0,15).map(s=>`<div class="pending-row"><div style="font-weight:600">${s.name} <span style="font-family:monospace;color:var(--gold)">${f$(s.net)}</span></div><div style="font-size:12px;color:var(--text2)">${fd(s.date)} · ${summ(s)}</div></div>`).join(''):'<div style="color:var(--green);font-size:13px">✓ No unpaid sessions</div>';
+}
+
+function renderMonth(){
+  const m=thm();
+  const ms=rem.sessions.filter(s=>s.date&&s.date.startsWith(m)&&s.status!=='Cancelled');
+  const mr=ms.reduce((a,s)=>a+Number(s.net||0),0);
+  const mp=ms.filter(s=>s.payment!=='Pending / unpaid').reduce((a,s)=>a+Number(s.net||0),0);
+  const me=rem.expenses.filter(e=>e.date&&e.date.startsWith(m)).reduce((a,e)=>a+Number(e.amount||0),0);
+  const mpr=mr-me;
+  const md=ms.reduce((a,s)=>a+Number(s.discount||0),0);
+  const mem=rem.customers.filter(c=>c.type==='Member').length;
+  document.getElementById('month-metrics').innerHTML=`
+    <div class="metric gold"><div class="m-label">Month revenue</div><div class="m-value">${f$(mr)}</div><div class="m-sub">${ms.length} sessions</div></div>
+    <div class="metric green"><div class="m-label">Collected</div><div class="m-value">${f$(mp)}</div></div>
+    <div class="metric red"><div class="m-label">Expenses</div><div class="m-value">${f$(me)}</div></div>
+    <div class="metric ${mpr>=0?'green':'red'}"><div class="m-label">Net profit</div><div class="m-value">${f$(mpr)}</div></div>
+    <div class="metric amber"><div class="m-label">Discounts given</div><div class="m-value">${f$(md)}</div></div>
+    <div class="metric"><div class="m-label">Members</div><div class="m-value" style="color:var(--gold)">${mem}</div></div>`;
+  const bySvc={};ms.forEach(s=>(s.items||[]).forEach(i=>{const k=i.service.split(':')[0].trim();bySvc[k]=(bySvc[k]||0)+i.unitPrice*i.qty;}));
+  const sv=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]);const mx=sv[0]?sv[0][1]:1;
+  document.getElementById('month-bars').innerHTML=sv.length?sv.map(([k,v])=>`<div class="bar-row"><div class="bar-label">${k.length>11?k.slice(0,11)+'…':k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/mx*100)}%"></div></div><div class="bar-val">${f$(v)}</div></div>`).join(''):'<div class="empty-msg">No sessions this month</div>';
+  const el=rem.expenses.filter(e=>e.date&&e.date.startsWith(m)).reverse();
+  document.getElementById('month-expenses').innerHTML=el.length?el.map(e=>`<div class="sess-row"><div><div class="sess-name" style="font-size:13px">${e.desc}</div><div class="sess-detail">${e.cat} · ${fd(e.date)}</div></div><div class="sess-amount" style="color:var(--red)">${f$(e.amount)}</div></div>`).join(''):'<div class="empty-msg">No expenses this month</div>';
+}
+
+function renderAllTime(){
+  const ac=rem.sessions.filter(s=>s.status!=='Cancelled');
+  const tot=ac.reduce((a,s)=>a+Number(s.net||0),0);
+  const texp=rem.expenses.reduce((a,e)=>a+Number(e.amount||0),0);
+  const np=rem.customers.filter(c=>c.isNew&&!c.feedbackDone).length;
+  document.getElementById('alltime-metrics').innerHTML=`
+    <div class="metric gold"><div class="m-label">All-time revenue</div><div class="m-value">${f$(tot)}</div></div>
+    <div class="metric green"><div class="m-label">Net profit</div><div class="m-value">${f$(tot-texp)}</div></div>
+    <div class="metric"><div class="m-label">Sessions</div><div class="m-value">${ac.length}</div></div>
+    <div class="metric"><div class="m-label">Customers</div><div class="m-value">${rem.customers.length}</div><div class="m-sub">${np} need callback</div></div>`;
+  const bySvc={};ac.forEach(s=>(s.items||[]).forEach(i=>{const k=i.service.split(':')[0].trim();bySvc[k]=(bySvc[k]||0)+i.unitPrice*i.qty;}));
+  const sv=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]);const mx=sv[0]?sv[0][1]:1;
+  document.getElementById('alltime-bars').innerHTML=sv.length?sv.map(([k,v])=>`<div class="bar-row"><div class="bar-label">${k.length>11?k.slice(0,11)+'…':k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/mx*100)}%"></div></div><div class="bar-val">${f$(v)}</div></div>`).join(''):'<div class="empty-msg">No data</div>';
+  const byM={};ac.forEach(s=>{if(s.date){const mm=s.date.slice(0,7);byM[mm]=(byM[mm]||0)+Number(s.net||0);}});
+  const ml=Object.entries(byM).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6);const mxM=ml.length?Math.max(...ml.map(x=>x[1])):1;
+  document.getElementById('monthly-trend').innerHTML=ml.length?ml.map(([k,v])=>{const[yr,mo]=k.split('-');const l=new Date(+yr,+mo-1).toLocaleString('default',{month:'short'})+' '+yr.slice(2);return`<div class="bar-row"><div class="bar-label">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/mxM*100)}%"></div></div><div class="bar-val">${f$(v)}</div></div>`;}).join(''):'<div class="empty-msg">No monthly data</div>';
+  const tc=[...rem.customers].sort((a,b)=>(b.spent||0)-(a.spent||0)).slice(0,8);
+  document.getElementById('top-customers').innerHTML=tc.length?tc.map(c=>`<div class="sess-row"><div><div class="sess-name">${c.name}${c.type==='Member'?' ⭐':''}</div><div class="sess-detail">${c.visits||0} visit${(c.visits||0)!==1?'s':''} · ${c.phone}</div></div><div class="sess-amount">${f$(c.spent||0)}</div></div>`).join(''):'<div class="empty-msg">No data</div>';
+}
+
+function renderStock(){
+  const sl=document.getElementById('stock-list');
+  sl.innerHTML=rem.stock.length?rem.stock.map(s=>{
+    const cls=s.qty===0?'out':s.qty<=(s.low||0)&&(s.low||0)>0?'low':'ok';
+    const lbl=s.qty===0?'⚠ OUT':s.qty<=(s.low||0)&&(s.low||0)>0?'⚠ LOW':'✓ OK';
+    return`<div class="stock-item"><div><div style="font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--text3)">${s.notes||''}</div></div><div style="text-align:right"><div class="stock-qty ${cls}">${s.qty}</div><div style="font-size:10px;font-weight:700" class="${cls}">${lbl}</div></div></div>`;
+  }).join(''):'<div class="empty-msg">No stock items</div>';
+  const mem=rem.customers.filter(c=>c.type==='Member');
+  document.getElementById('mem-badge').textContent='('+mem.length+')';
+  document.getElementById('members-list').innerHTML=mem.length?mem.map(c=>`<div class="sess-row"><div><div class="sess-name">${c.name}</div><div class="sess-detail">${c.phone} · ${c.visits||0} visits</div></div><div style="text-align:right"><div style="color:var(--gold);font-weight:700;font-size:12px">Member</div><div class="sess-pay">${f$(c.spent||0)}</div></div></div>`).join(''):'<div class="empty-msg">No members yet</div>';
+}
+
+function tab(name){
+  ['today','month','alltime','stock'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===name);
+    document.getElementById('bn-'+t).classList.toggle('active',t===name);
+  });
+}
+
+// ── INIT ──
+const _c=gcfg();
+if(!_c.bin||!_c.pin)document.getElementById('cfg-area').style.display='block';
+tickH();setInterval(tickH,30000);
+</script>
+</body>
+</html>
