@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Owner Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f7f6f3;--bg2:#ffffff;--bg3:#f0efe9;--border:#e2e0d8;
+  --text:#1a1916;--text2:#6b6860;--text3:#a8a49a;
+  --gold:#8a6a1e;--gold-bg:#fdf3dc;--gold-border:#e8c96a;
+  --green:#1e7a46;--green-bg:#e8f7ee;--green-border:#a8dfc0;
+  --red:#c0392b;--red-bg:#fdecea;--red-border:#f0b0a8;
+  --amber:#8a5a00;--amber-bg:#fff4e0;--amber-border:#f0cc80;
+  --blue:#1a5fa8;--blue-bg:#e8f1fb;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+/* PIN SCREEN */
+#pin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.pin-logo{font-size:32px;margin-bottom:8px}
+.pin-title{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px}
+.pin-sub{font-size:13px;color:var(--text3);margin-bottom:32px}
+.pin-dots{display:flex;gap:14px;margin-bottom:24px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--bg3);transition:background .15s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px}
+.pin-key{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;font-size:22px;font-weight:600;text-align:center;cursor:pointer;box-shadow:var(--shadow);transition:all .1s;user-select:none}
+.pin-key:active{transform:scale(.94);background:var(--bg3)}
+.pin-key.del{font-size:16px;color:var(--text2)}
+.pin-error{color:var(--red);font-size:13px;margin-top:12px;min-height:20px}
+.pin-cfg{margin-top:28px;font-size:12px;color:var(--text3)}
+.pin-cfg input{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;width:260px;margin-bottom:8px;display:block}
+/* MAIN DASHBOARD */
+#main-screen{display:none;padding:16px;max-width:480px;margin:0 auto;padding-bottom:80px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:8px}
+.header-title{font-size:18px;font-weight:700;color:var(--gold)}
+.header-time{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.refresh-btn{background:var(--gold);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+/* Metrics */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.metric.full{grid-column:1/3}
+.metric.gold{background:var(--gold-bg);border-color:var(--gold-border)}
+.metric.green{background:var(--green-bg);border-color:var(--green-border)}
+.metric.red{background:var(--red-bg);border-color:var(--red-border)}
+.metric.amber{background:var(--amber-bg);border-color:var(--amber-border)}
+.m-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:5px}
+.m-value{font-size:26px;font-weight:700;font-family:'DM Mono',monospace}
+.metric.gold .m-value{color:var(--gold)}
+.metric.green .m-value{color:var(--green)}
+.metric.red .m-value{color:var(--red)}
+.metric.amber .m-value{color:var(--amber)}
+.m-sub{font-size:11px;color:var(--text2);margin-top:3px}
+/* Section */
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:12px}
+/* Session rows */
+.sess-row{padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sess-row:last-child{border-bottom:none}
+.sess-name{font-weight:600;font-size:14px}
+.sess-detail{font-size:12px;color:var(--text2);margin-top:2px}
+.sess-amount{font-weight:700;font-family:'DM Mono',monospace;color:var(--gold);text-align:right;flex-shrink:0}
+.sess-pay{font-size:11px;color:var(--text2);text-align:right}
+/* Bar */
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.bar-label{width:100px;color:var(--text2);text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:7px;background:var(--bg3);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:99px;background:var(--gold)}
+.bar-val{width:44px;font-family:'DM Mono',monospace;font-weight:600;text-align:right;font-size:11px}
+/* Stock */
+.stock-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stock-item:last-child{border-bottom:none}
+.stock-qty{font-family:'DM Mono',monospace;font-weight:700;font-size:16px}
+.ok{color:var(--green)}.low{color:var(--amber)}.out{color:var(--red)}
+/* Pending */
+.pending-row{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pending-row:last-child{border-bottom:none}
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.bnav-item{flex:1;padding:12px 4px 10px;text-align:center;cursor:pointer;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);transition:color .12s}
+.bnav-item.active{color:var(--gold)}
+.bnav-icon{font-size:20px;display:block;margin-bottom:2px}
+/* Tab */
+.tab{display:none}.tab.active{display:block}
+.badge-pill{display:inline-block;background:var(--red);color:#fff;border-radius:99px;font-size:10px;padding:1px 6px;margin-left:4px;vertical-align:middle}
+/* Pull refresh hint */
+.last-sync{text-align:center;font-size:11px;color:var(--text3);margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-logo">🎯</div>
+  <div class="pin-title">Soukhour Owner</div>
+  <div class="pin-sub">Enter your PIN to continue</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-pad">
+    <div class="pin-key" onclick="pinKey('1')">1</div>
+    <div class="pin-key" onclick="pinKey('2')">2</div>
+    <div class="pin-key" onclick="pinKey('3')">3</div>
+    <div class="pin-key" onclick="pinKey('4')">4</div>
+    <div class="pin-key" onclick="pinKey('5')">5</div>
+    <div class="pin-key" onclick="pinKey('6')">6</div>
+    <div class="pin-key" onclick="pinKey('7')">7</div>
+    <div class="pin-key" onclick="pinKey('8')">8</div>
+    <div class="pin-key" onclick="pinKey('9')">9</div>
+    <div class="pin-key" onclick="pinClear()" style="grid-column:1">⌫</div>
+    <div class="pin-key" onclick="pinKey('0')">0</div>
+    <div class="pin-key" style="background:var(--gold-bg);color:var(--gold)" onclick="pinSubmit()">→</div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+
+  <!-- First-time config -->
+  <div class="pin-cfg" id="pin-cfg-area">
+    <div style="margin-bottom:8px;font-weight:600;color:var(--text2)">First time? Configure below:</div>
+    <input id="cfg-binid" type="text" placeholder="JSONBin Bin ID">
+    <input id="cfg-pin" type="password" placeholder="Choose a 4-digit PIN" maxlength="4">
+    <button onclick="saveConfig()" style="width:100%;padding:10px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px">Save config</button>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div id="main-screen">
+  <div class="header">
+    <div>
+      <div class="header-title">🎯 Owner Dashboard</div>
+      <div class="header-time" id="hdr-time"></div>
+    </div>
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+  <div class="last-sync" id="last-sync"></div>
+
+  <!-- TABS -->
+  <div class="tab active" id="tab-today">
+    <div class="metrics" id="today-metrics"></div>
+    <div class="section">
+      <div class="section-title">Today's sessions</div>
+      <div id="today-sessions"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Pending payments (unpaid)</div>
+      <div id="pending-list"></div>
+    </div>
+  </div>
+
+  <div class="tab" id="tab-month">
+    <div class="metrics" id="month-metrics"></div>
+    <div class="section">
+      <div class="section-title">Revenue by service this month</div>
+      <div id="month-bars"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Expenses this month</div>
+      <div id="month-expenses"></div>
+    </div>
+  </div>
+
+  <div class="tab" id="tab-alltime">
+    <div class="metrics" id="alltime-metrics"></div>
+    <div class="section">
+      <div class="section-title">All-time by service</div>
+      <div id="alltime-bars"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Monthly revenue trend</div>
+      <div id="monthly-trend"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Top customers by spend</div>
+      <div id="top-customers"></div>
+    </div>
+  </div>
+
+  <div class="tab" id="tab-stock">
+    <div class="section">
+      <div class="section-title">Ammunition stock levels</div>
+      <div id="stock-list"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Members <span id="mem-count-badge"></span></div>
+      <div id="members-list"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="bnav-item active" id="bnav-today" onclick="showTab('today')"><span class="bnav-icon">◈</span>Today</div>
+    <div class="bnav-item" id="bnav-month" onclick="showTab('month')"><span class="bnav-icon">◐</span>Month</div>
+    <div class="bnav-item" id="bnav-alltime" onclick="showTab('alltime')"><span class="bnav-icon">◑</span>All-time</div>
+    <div class="bnav-item" id="bnav-stock" onclick="showTab('stock')"><span class="bnav-icon">▦</span>Stock</div>
+  </div>
+</div>
+
+<script>
+const CFG_KEY='soukhour_owner_cfg';
+let pin_entered='';
+let remote={};
+
+function getCfg(){try{return JSON.parse(localStorage.getItem(CFG_KEY)||'{}');}catch(e){return{};}}
+function saveCfg(c){localStorage.setItem(CFG_KEY,JSON.stringify(c));}
+
+// ─── PIN ───
+function pinKey(d){
+  if(pin_entered.length>=4)return;
+  pin_entered+=d;
+  updateDots();
+  if(pin_entered.length===4)setTimeout(pinSubmit,120);
+}
+function pinClear(){
+  pin_entered=pin_entered.slice(0,-1);
+  updateDots();
+  document.getElementById('pin-error').textContent='';
+}
+function updateDots(){
+  for(let i=0;i<4;i++){
+    document.getElementById('d'+i).classList.toggle('filled',i<pin_entered.length);
+  }
+}
+function pinSubmit(){
+  const cfg=getCfg();
+  if(!cfg.pin||!cfg.binId){
+    document.getElementById('pin-error').textContent='Configure your PIN and Bin ID below first.';
+    pin_entered='';updateDots();return;
+  }
+  if(pin_entered===cfg.pin){
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('main-screen').style.display='block';
+    document.getElementById('pin-cfg-area').style.display='none';
+    loadData();
+    setInterval(loadData,60000); // auto-refresh every 60s
+    setInterval(tickHdr,10000);
+    tickHdr();
+  } else {
+    document.getElementById('pin-error').textContent='Wrong PIN. Try again.';
+    pin_entered='';updateDots();
+  }
+}
+function saveConfig(){
+  const binId=document.getElementById('cfg-binid').value.trim();
+  const pin=document.getElementById('cfg-pin').value.trim();
+  if(!binId||pin.length!==4||isNaN(pin)){alert('Bin ID required and PIN must be 4 digits.');return;}
+  saveCfg({binId,pin});
+  document.getElementById('pin-cfg-area').style.display='none';
+  document.getElementById('pin-error').textContent='Config saved! Enter your PIN above.';
+}
+
+// ─── DATA ───
+async function loadData(){
+  const cfg=getCfg();
+  if(!cfg.binId)return;
+  try{
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${cfg.binId}/latest`,{
+      headers:{'X-Access-Key':cfg.apiKey||''}
+    });
+    const j=await r.json();
+    remote=j.record||{};
+    remote.sessions=remote.sessions||[];
+    remote.customers=remote.customers||[];
+    remote.expenses=remote.expenses||[];
+    remote.stock=remote.stock||[];
+    document.getElementById('last-sync').textContent='Last sync: '+new Date(remote.ts||Date.now()).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    renderAll();
+  }catch(e){
+    document.getElementById('last-sync').textContent='Could not load — check internet.';
+  }
+}
+
+function tickHdr(){
+  const n=new Date();
+  const el=document.getElementById('hdr-time');
+  if(el)el.textContent=n.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'})+' · '+n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+function fmt$(n){return'$'+Number(n||0).toFixed(0);}
+function fmtDate(d){if(!d)return'–';return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
+function today(){return new Date().toISOString().slice(0,10);}
+function thisMonth(){return new Date().toISOString().slice(0,7);}
+function sessionSummary(s){return(s.items||[]).map(i=>(i.qty>1?i.qty+'× ':'')+i.service).join(', ');}
+
+function payBadge(p){
+  if(p==='Pending / unpaid')return`<span style="color:var(--amber);font-size:11px;font-weight:700">⚠ Unpaid</span>`;
+  return`<span style="color:var(--green);font-size:11px">✓ ${p}</span>`;
+}
+
+// ─── RENDER ALL ───
+function renderAll(){
+  renderToday();
+  renderMonth();
+  renderAllTime();
+  renderStock();
+}
+
+function renderToday(){
+  const todaySess=remote.sessions.filter(s=>s.date===today()&&s.status!=='Cancelled');
+  const todayRev=todaySess.reduce((a,s)=>a+Number(s.net||0),0);
+  const todayPaid=todaySess.filter(s=>s.payment!=='Pending / unpaid').reduce((a,s)=>a+Number(s.net||0),0);
+  const todayPending=todaySess.filter(s=>s.payment==='Pending / unpaid').reduce((a,s)=>a+Number(s.net||0),0);
+  const allPending=remote.sessions.filter(s=>s.payment==='Pending / unpaid'&&s.status!=='Cancelled');
+  const allPendingAmt=allPending.reduce((a,s)=>a+Number(s.net||0),0);
+
+  document.getElementById('today-metrics').innerHTML=`
+    <div class="metric gold"><div class="m-label">Today revenue</div><div class="m-value">${fmt$(todayRev)}</div><div class="m-sub">${todaySess.length} session${todaySess.length!==1?'s':''}</div></div>
+    <div class="metric green"><div class="m-label">Collected today</div><div class="m-value">${fmt$(todayPaid)}</div></div>
+    <div class="metric amber full"><div class="m-label">All unpaid (all time)</div><div class="m-value">${fmt$(allPendingAmt)}</div><div class="m-sub">${allPending.length} session${allPending.length!==1?'s':''} not yet paid</div></div>
+  `;
+
+  const tl=document.getElementById('today-sessions');
+  if(!todaySess.length){tl.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px 0">No sessions recorded today</div>';return;}
+  tl.innerHTML=[...todaySess].reverse().map(s=>`
+    <div class="sess-row">
+      <div>
+        <div class="sess-name">${s.name}</div>
+        <div class="sess-detail">${s.time||''} · ${sessionSummary(s)}</div>
+        <div style="margin-top:3px">${payBadge(s.payment)}</div>
+      </div>
+      <div>
+        <div class="sess-amount">${fmt$(s.net)}</div>
+        ${s.discount>0?`<div class="sess-pay" style="color:var(--red)">-${fmt$(s.discount)} disc</div>`:''}
+      </div>
+    </div>`).join('');
+
+  const pl=document.getElementById('pending-list');
+  if(!allPending.length){pl.innerHTML='<div style="color:var(--green);font-size:13px;padding:4px 0">✓ No unpaid sessions</div>';return;}
+  pl.innerHTML=[...allPending].reverse().slice(0,10).map(s=>`
+    <div class="pending-row">
+      <div style="font-weight:600">${s.name} · <span style="font-family:monospace">${fmt$(s.net)}</span></div>
+      <div style="font-size:12px;color:var(--text2)">${fmtDate(s.date)} · ${sessionSummary(s)}</div>
+    </div>`).join('');
+}
+
+function renderMonth(){
+  const m=thisMonth();
+  const mSess=remote.sessions.filter(s=>s.date&&s.date.startsWith(m)&&s.status!=='Cancelled');
+  const mRev=mSess.reduce((a,s)=>a+Number(s.net||0),0);
+  const mPaid=mSess.filter(s=>s.payment!=='Pending / unpaid').reduce((a,s)=>a+Number(s.net||0),0);
+  const mExp=remote.expenses.filter(e=>e.date&&e.date.startsWith(m)).reduce((a,e)=>a+Number(e.amount||0),0);
+  const mProfit=mRev-mExp;
+  const mDisc=mSess.reduce((a,s)=>a+Number(s.discount||0),0);
+  const members=remote.customers.filter(c=>c.type==='Member').length;
+
+  document.getElementById('month-metrics').innerHTML=`
+    <div class="metric gold"><div class="m-label">Month revenue</div><div class="m-value">${fmt$(mRev)}</div><div class="m-sub">${mSess.length} sessions</div></div>
+    <div class="metric green"><div class="m-label">Collected</div><div class="m-value">${fmt$(mPaid)}</div></div>
+    <div class="metric red"><div class="m-label">Expenses</div><div class="m-value">${fmt$(mExp)}</div></div>
+    <div class="metric ${mProfit>=0?'green':'red'}"><div class="m-label">Net profit</div><div class="m-value">${fmt$(mProfit)}</div></div>
+    <div class="metric amber"><div class="m-label">Discounts given</div><div class="m-value">${fmt$(mDisc)}</div><div class="m-sub">This month</div></div>
+    <div class="metric"><div class="m-label">Members</div><div class="m-value" style="color:var(--gold)">${members}</div></div>
+  `;
+
+  // by service
+  const bySvc={};
+  mSess.forEach(s=>(s.items||[]).forEach(i=>{const k=i.service.split(':')[0].trim();bySvc[k]=(bySvc[k]||0)+i.unitPrice*i.qty;}));
+  const svcs=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]);
+  const maxS=svcs[0]?svcs[0][1]:1;
+  document.getElementById('month-bars').innerHTML=svcs.length?svcs.map(([k,v])=>`
+    <div class="bar-row">
+      <div class="bar-label">${k.length>12?k.slice(0,12)+'…':k}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxS*100)}%"></div></div>
+      <div class="bar-val">${fmt$(v)}</div>
+    </div>`).join(''):'<div style="color:#aaa;font-size:13px">No sessions this month</div>';
+
+  // expenses
+  const mExpList=remote.expenses.filter(e=>e.date&&e.date.startsWith(m)).reverse();
+  document.getElementById('month-expenses').innerHTML=mExpList.length?mExpList.map(e=>`
+    <div class="sess-row">
+      <div><div class="sess-name" style="font-size:13px">${e.desc}</div><div class="sess-detail">${e.cat} · ${fmtDate(e.date)}</div></div>
+      <div class="sess-amount" style="color:var(--red)">${fmt$(e.amount)}</div>
+    </div>`).join(''):'<div style="color:#aaa;font-size:13px">No expenses this month</div>';
+}
+
+function renderAllTime(){
+  const active=remote.sessions.filter(s=>s.status!=='Cancelled');
+  const total=active.reduce((a,s)=>a+Number(s.net||0),0);
+  const totalExp=remote.expenses.reduce((a,e)=>a+Number(e.amount||0),0);
+  const totalSess=active.length;
+  const totalCust=remote.customers.length;
+  const newPending=remote.customers.filter(c=>c.isNew&&!c.feedbackDone).length;
+
+  document.getElementById('alltime-metrics').innerHTML=`
+    <div class="metric gold"><div class="m-label">All-time revenue</div><div class="m-value">${fmt$(total)}</div></div>
+    <div class="metric green"><div class="m-label">Net profit</div><div class="m-value">${fmt$(total-totalExp)}</div></div>
+    <div class="metric"><div class="m-label">Total sessions</div><div class="m-value">${totalSess}</div></div>
+    <div class="metric"><div class="m-label">Customers</div><div class="m-value">${totalCust}</div><div class="m-sub">${newPending} need feedback call</div></div>
+  `;
+
+  // all-time by service
+  const bySvc={};
+  active.forEach(s=>(s.items||[]).forEach(i=>{const k=i.service.split(':')[0].trim();bySvc[k]=(bySvc[k]||0)+i.unitPrice*i.qty;}));
+  const svcs=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]);
+  const maxS=svcs[0]?svcs[0][1]:1;
+  document.getElementById('alltime-bars').innerHTML=svcs.length?svcs.map(([k,v])=>`
+    <div class="bar-row">
+      <div class="bar-label">${k.length>12?k.slice(0,12)+'…':k}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxS*100)}%"></div></div>
+      <div class="bar-val">${fmt$(v)}</div>
+    </div>`).join(''):'<div style="color:#aaa;font-size:13px">No data</div>';
+
+  // monthly trend
+  const byM={};
+  active.forEach(s=>{if(s.date){const m=s.date.slice(0,7);byM[m]=(byM[m]||0)+Number(s.net||0);}});
+  const mList=Object.entries(byM).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6);
+  const maxM=mList.length?Math.max(...mList.map(x=>x[1])):1;
+  document.getElementById('monthly-trend').innerHTML=mList.length?mList.map(([k,v])=>{
+    const[yr,mo]=k.split('-');
+    const l=new Date(+yr,+mo-1).toLocaleString('default',{month:'short'})+' '+yr.slice(2);
+    return`<div class="bar-row"><div class="bar-label">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxM*100)}%"></div></div><div class="bar-val">${fmt$(v)}</div></div>`;
+  }).join(''):'<div style="color:#aaa;font-size:13px">No monthly data</div>';
+
+  // top customers
+  const topCu=[...remote.customers].sort((a,b)=>(b.spent||0)-(a.spent||0)).slice(0,8);
+  document.getElementById('top-customers').innerHTML=topCu.length?topCu.map(c=>`
+    <div class="sess-row">
+      <div>
+        <div class="sess-name">${c.name}${c.type==='Member'?' ⭐':''}</div>
+        <div class="sess-detail">${c.visits||0} visit${(c.visits||0)!==1?'s':''} · ${c.phone}</div>
+      </div>
+      <div class="sess-amount">${fmt$(c.spent||0)}</div>
+    </div>`).join(''):'<div style="color:#aaa;font-size:13px">No customer data</div>';
+}
+
+function renderStock(){
+  const sl=document.getElementById('stock-list');
+  if(!remote.stock.length){sl.innerHTML='<div style="color:#aaa;font-size:13px">No stock items</div>';}
+  else{
+    sl.innerHTML=remote.stock.map(s=>{
+      const cls=s.qty===0?'out':s.qty<=(s.low||0)&&(s.low||0)>0?'low':'ok';
+      const lbl=s.qty===0?'OUT':'LOW':'OK';
+      return`<div class="stock-item">
+        <div><div style="font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--text3)">${s.notes||''}</div></div>
+        <div style="text-align:right"><div class="stock-qty ${cls}">${s.qty}</div><div style="font-size:10px" class="${cls}">${s.qty===0?'OUT':s.qty<=(s.low||0)&&(s.low||0)>0?'⚠ LOW':'✓ OK'}</div></div>
+      </div>`;
+    }).join('');
+  }
+
+  const members=remote.customers.filter(c=>c.type==='Member');
+  document.getElementById('mem-count-badge').textContent=members.length;
+  document.getElementById('members-list').innerHTML=members.length?members.map(c=>`
+    <div class="sess-row">
+      <div><div class="sess-name">${c.name}</div><div class="sess-detail">${c.phone} · ${c.visits||0} visits</div></div>
+      <div style="text-align:right"><div style="color:var(--gold);font-weight:600;font-size:12px">Member</div><div class="sess-pay">${fmt$(c.spent||0)} total</div></div>
+    </div>`).join(''):'<div style="color:#aaa;font-size:13px">No members yet</div>';
+}
+
+// ─── TAB NAV ───
+function showTab(name){
+  ['today','month','alltime','stock'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===name);
+    document.getElementById('bnav-'+t).classList.toggle('active',t===name);
+  });
+}
+
+// ─── INIT ───
+const cfg=getCfg();
+if(!cfg.binId||!cfg.pin){
+  document.getElementById('pin-cfg-area').style.display='block';
+} else {
+  document.getElementById('pin-cfg-area').style.display='none';
+}
+tickHdr();setInterval(tickHdr,30000);
+</script>
+</body>
+</html>
