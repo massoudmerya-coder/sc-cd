@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soukhour Shooting Club — Management</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f7f6f3;--bg2:#ffffff;--bg3:#f0efe9;--bg4:#e8e6df;
+  --border:#e2e0d8;--border2:#ccc9be;
+  --text:#1a1916;--text2:#6b6860;--text3:#a8a49a;
+  --gold:#8a6a1e;--gold2:#b8900a;--gold-bg:#fdf3dc;--gold-border:#e8c96a;
+  --green:#1e7a46;--green-bg:#e8f7ee;--green-border:#a8dfc0;
+  --red:#c0392b;--red-bg:#fdecea;--red-border:#f0b0a8;
+  --amber:#8a5a00;--amber-bg:#fff4e0;--amber-border:#f0cc80;
+  --blue:#1a5fa8;--blue-bg:#e8f1fb;--blue-border:#a8c8f0;
+  --purple:#5a2d8a;--purple-bg:#f3edfb;--purple-border:#c8a8e8;
+  --new-bg:#fff8e1;--new-border:#f0cc80;
+  --radius:8px;--radius-lg:12px;--shadow:0 1px 4px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;box-shadow:var(--shadow)}
+.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.club-name{font-size:14px;font-weight:600;color:var(--gold);letter-spacing:.03em}
+.system-name{font-size:11px;color:var(--text3);margin-top:2px}
+.nav-section{padding:14px 14px 6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 8px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s;user-select:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--gold-bg);color:var(--gold);font-weight:500;border:1px solid var(--gold-border)}
+.nav-item .icon{font-size:15px;width:18px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding:14px;border-top:1px solid var(--border);font-size:11px;color:var(--text3)}
+#clock{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)}
+.main{margin-left:230px;flex:1;padding:28px 32px;max-width:calc(100vw - 230px)}
+.screen{display:none}.screen.active{display:block}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px}
+.page-title{font-size:22px;font-weight:600;color:var(--text)}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:20px}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;box-shadow:var(--shadow)}
+.metric-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600}
+.metric-value{font-size:24px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text)}
+.metric-sub{font-size:11px;color:var(--text2);margin-top:3px}
+.metric.gold{border-color:var(--gold-border);background:var(--gold-bg)}.metric.gold .metric-value{color:var(--gold)}
+.metric.green{border-color:var(--green-border);background:var(--green-bg)}.metric.green .metric-value{color:var(--green)}
+.metric.amber{border-color:var(--amber-border);background:var(--amber-bg)}.metric.amber .metric-value{color:var(--amber)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px;font-weight:600}
+input,select,textarea{width:100%;padding:8px 11px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border .12s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold2);box-shadow:0 0 0 2px var(--gold-bg)}
+textarea{resize:vertical;min-height:60px}
+.field-row{display:grid;gap:10px;margin-bottom:10px}
+.col2{grid-template-columns:1fr 1fr}.col3{grid-template-columns:1fr 1fr 1fr}.col4{grid-template-columns:1fr 1fr 1fr 1fr}
+.btn{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:var(--shadow)}
+.btn:hover{background:var(--bg3)}.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:600}
+.btn-gold:hover{background:var(--gold2)}
+.btn-sm{padding:4px 10px;font-size:12px;box-shadow:none}
+.btn-danger{color:var(--red);border-color:var(--red-border)}.btn-danger:hover{background:var(--red-bg)}
+.btn-success{color:var(--green);border-color:var(--green-border)}.btn-success:hover{background:var(--green-bg)}
+.btn-row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:8px 12px;border-bottom:2px solid var(--border);background:var(--bg3)}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+tr.row-new td{background:var(--new-bg)!important;border-left:3px solid var(--amber-border)}
+tr.row-new:hover td{background:#fff3cc!important}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;border:1px solid}
+.b-confirmed{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.b-pending{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.b-cancelled{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.b-member{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-border)}
+.b-regular{background:var(--bg3);color:var(--text2);border-color:var(--border)}
+.b-corporate{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.b-new{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.search-row{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.search-row input{max-width:220px}.search-row select{max-width:160px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.bar-label{width:130px;color:var(--text2);text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:99px;background:var(--gold);transition:width .5s}
+.bar-val{width:52px;font-family:'DM Mono',monospace;font-weight:600;text-align:right;font-size:12px;color:var(--text)}
+.receipt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;margin-top:12px;font-size:13px}
+.receipt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)}
+.receipt-row:last-child{border-bottom:none;font-weight:700;font-size:15px;color:var(--gold);padding-top:10px}
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:10px;border:1px solid}
+.alert-success{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.alert-error{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.comp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;box-shadow:var(--shadow)}
+.today-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.today-item:last-child{border-bottom:none}
+.member-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.member-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold-bg);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--gold);flex-shrink:0}
+.info-box{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--blue);margin-bottom:14px}
+.warn-box{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--amber);margin-bottom:14px}
+.stock-low{color:var(--red)!important;font-weight:700}
+.stock-ok{color:var(--green)!important;font-weight:700}
+.stock-warn{color:var(--amber)!important;font-weight:700}
+.edit-input{padding:4px 8px;font-size:12px;border-radius:4px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);width:100%}
+/* Customer profile panel */
+.cust-profile{background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;gap:16px}
+.cust-profile-info{flex:1}
+.cust-profile-name{font-weight:700;font-size:16px;color:var(--text)}
+.cust-profile-stats{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap}
+.cust-stat{font-size:12px;color:var(--text2);background:var(--bg2);padding:3px 10px;border-radius:99px;border:1px solid var(--border)}
+/* Multi-item session */
+.item-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg3);border-radius:var(--radius);margin-bottom:6px;border:1px solid var(--border)}
+.item-row .item-name{flex:1;font-size:13px;font-weight:500}
+.item-row .item-price{font-family:'DM Mono',monospace;font-weight:600;color:var(--gold);min-width:50px;text-align:right}
+/* Feedback */
+.feedback-new{background:var(--amber-bg);border:2px solid var(--amber-border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:10px;box-shadow:var(--shadow)}
+.feedback-done{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:10px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:99px}
+</style>
+</head>
+<body>
+<div class="shell">
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="club-name">🎯 Soukhour Shooting Club</div>
+    <div class="system-name">Management System</div>
+  </div>
+  <div class="nav-section">Main</div>
+  <div class="nav-item active" onclick="go('dashboard')"><span class="icon">◈</span> Dashboard</div>
+  <div class="nav-item" onclick="go('booking')"><span class="icon">＋</span> New session</div>
+  <div class="nav-item" onclick="go('bookings')"><span class="icon">≡</span> All sessions</div>
+  <div class="nav-section">People</div>
+  <div class="nav-item" onclick="go('members')"><span class="icon">★</span> Members</div>
+  <div class="nav-item" onclick="go('customers')"><span class="icon">◎</span> All customers</div>
+  <div class="nav-item" onclick="go('feedback')"><span class="icon">✉</span> Feedback calls <span id="feedback-badge" style="background:var(--amber);color:#fff;border-radius:99px;font-size:10px;padding:1px 6px;margin-left:4px;display:none"></span></div>
+  <div class="nav-section">Finance</div>
+  <div class="nav-item" onclick="go('income')"><span class="icon">◐</span> Income</div>
+  <div class="nav-item" onclick="go('expenses')"><span class="icon">◑</span> Expenses</div>
+  <div class="nav-item" onclick="go('stock')"><span class="icon">▦</span> Ammo stock</div>
+  <div class="nav-section">Events</div>
+  <div class="nav-item" onclick="go('competitions')"><span class="icon">◉</span> Competitions</div>
+  <div class="nav-section">Admin</div>
+  <div class="nav-item" onclick="go('editdb')"><span class="icon">✎</span> Edit database</div>
+  <div class="sidebar-bottom">
+    <div id="clock" title="Owner: triple-click to configure phone sync" ondblclick="showSyncSetup()" style="cursor:default"></div>
+    <div style="margin-top:5px;color:var(--text3);font-size:11px">Data saved locally on this PC</div>
+    <button class="btn btn-sm" style="margin-top:10px;width:100%" onclick="exportAll()">⤓ Export all CSV</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="screen active" id="screen-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-date"></div></div>
+    <button class="btn btn-gold" onclick="go('booking')">＋ New session</button>
+  </div>
+  <div class="metrics" id="dash-metrics"></div>
+  <div class="grid2">
+    <div class="card"><div class="card-title">Today's sessions</div><div id="today-list"></div></div>
+    <div class="card"><div class="card-title">Revenue by game type</div><div id="dash-bars"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent sessions</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Status</th><th>Items</th><th>Total</th><th>Payment</th><th>Session status</th></tr></thead>
+      <tbody id="dash-recent"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- NEW SESSION (multi-item) -->
+<div class="screen" id="screen-booking">
+  <div class="page-header">
+    <div><div class="page-title">New session</div><div class="page-sub">One customer can buy multiple items in one session</div></div>
+  </div>
+  <div id="bk-alert"></div>
+
+  <!-- Customer lookup -->
+  <div class="card">
+    <div class="card-title">Customer</div>
+    <div class="field-row col2">
+      <div><label>Phone number *</label><input id="b-phone" type="tel" placeholder="03 123 456 or 71 234 567" oninput="lookupCustomer()" style="font-family:'DM Mono',monospace"></div>
+      <div><label>Full name *</label><input id="b-name" type="text" placeholder="Will auto-fill if known customer" list="cust-suggest"><datalist id="cust-suggest"></datalist></div>
+    </div>
+    <div id="cust-profile-area"></div>
+    <div class="field-row col3">
+      <div><label>Date *</label><input id="b-date" type="date"></div>
+      <div><label>Time</label><input id="b-time" type="time" value="09:00"></div>
+      <div><label>How did they book?</label>
+        <select id="b-source"><option>Walk-in</option><option>WhatsApp</option><option>Phone call</option><option>Instagram</option><option>Facebook</option><option>Member referral</option><option>Other</option></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add items -->
+  <div class="card">
+    <div class="card-title">Items in this session <span id="session-total-label" style="font-size:13px;color:var(--gold);font-weight:700"></span></div>
+    <div id="member-hint" class="info-box" style="display:none">⭐ Member detected — member prices applied automatically.</div>
+    <div id="session-items"></div>
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px">
+      <div class="field-row col3" style="margin-bottom:8px">
+        <div><label>Add service</label>
+          <select id="b-service" onchange="calcItemPrice()">
+            <option value="">— select —</option>
+            <optgroup label="Shooting rounds">
+              <option value="Trap" data-pm="8" data-p="10">Trap — $10 / member $8</option>
+              <option value="Skeet" data-pm="8" data-p="10">Skeet — $10 / member $8</option>
+              <option value="Sporting Clays" data-pm="8" data-p="10">Sporting Clays — $10 / member $8</option>
+              <option value="American Trap" data-pm="8" data-p="10">American Trap — $10 / member $8</option>
+              <option value="Pistol session" data-pm="15" data-p="20">Pistol session — $20 / member $15</option>
+            </optgroup>
+            <optgroup label="Ammunition">
+              <option value="Ammo: 12-gauge" data-pm="12" data-p="15" data-ammo="12-gauge">Ammo: 12-gauge — $15/box</option>
+              <option value="Ammo: 20-gauge" data-pm="12" data-p="15" data-ammo="20-gauge">Ammo: 20-gauge — $15/box</option>
+              <option value="Ammo: 28-gauge" data-pm="14" data-p="18" data-ammo="28-gauge">Ammo: 28-gauge — $18/box</option>
+              <option value="Ammo: Other" data-pm="0" data-p="0" data-ammo="Other">Ammo: Other — enter price</option>
+            </optgroup>
+            <optgroup label="Packages">
+              <option value="Beginner package" data-pm="30" data-p="40">Beginner package — $40 / member $30</option>
+              <option value="Ladies day" data-pm="25" data-p="35">Ladies day — $35 / member $25</option>
+              <option value="Corporate (per person)" data-pm="35" data-p="40">Corporate (per person) — $40</option>
+            </optgroup>
+            <optgroup label="Add-ons">
+              <option value="Instructor (per hour)" data-pm="25" data-p="30">Instructor per hour — $30 / member $25</option>
+              <option value="Equipment rental" data-pm="8" data-p="10">Equipment rental — $10</option>
+              <option value="Lounge / café" data-pm="5" data-p="5">Lounge / café — $5</option>
+            </optgroup>
+            <optgroup label="Membership">
+              <option value="Membership (annual)" data-pm="75" data-p="75">Annual membership — $75</option>
+            </optgroup>
+            <optgroup label="Events">
+              <option value="Competition entry" data-pm="10" data-p="15">Competition entry — $15 / member $10</option>
+            </optgroup>
+            <option value="Other" data-pm="0" data-p="0">Other (enter manually)</option>
+          </select>
+        </div>
+        <div><label>Qty</label><input id="b-qty" type="number" value="1" min="1" onchange="calcItemPrice()"></div>
+        <div><label>Unit price ($)</label><input id="b-item-price" type="number" placeholder="0" step="0.5"></div>
+      </div>
+      <button class="btn btn-success" onclick="addItem()">＋ Add to session</button>
+    </div>
+  </div>
+
+  <!-- Payment -->
+  <div class="card">
+    <div class="card-title">Payment</div>
+    <div class="field-row col3">
+      <div><label>Payment method</label>
+        <select id="b-payment"><option>Cash</option><option>OMT</option><option>Whish Money</option><option>Bank transfer</option><option>Pending / unpaid</option></select>
+      </div>
+      <div><label>Discount ($)</label><input id="b-discount" type="number" value="0" min="0"></div>
+      <div><label>Status</label>
+        <select id="b-status"><option>Confirmed</option><option>Pending</option><option>Cancelled</option></select>
+      </div>
+    </div>
+    <div class="field-row" style="grid-template-columns:1fr">
+      <div><label>Session notes (discount reason, group name, etc.)</label>
+        <textarea id="b-notes" placeholder="e.g. Group of 6 from NDU. Discount approved by owner."></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="saveSession()">✓ Save session & receipt</button>
+      <button class="btn" onclick="clearSession()">Clear all</button>
+    </div>
+    <div id="receipt-area"></div>
+  </div>
+</div>
+
+<!-- ALL SESSIONS -->
+<div class="screen" id="screen-bookings">
+  <div class="page-header">
+    <div><div class="page-title">All sessions</div><div class="page-sub" id="bk-count"></div></div>
+  </div>
+  <div class="search-row">
+    <input type="text" id="bk-q" placeholder="Search name, phone, service..." oninput="renderBookings()">
+    <select id="bk-status" onchange="renderBookings()"><option value="">All statuses</option><option>Confirmed</option><option>Pending</option><option>Cancelled</option></select>
+    <select id="bk-month" onchange="renderBookings()"><option value="">All months</option></select>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Date</th><th>Time</th><th>Customer</th><th>Member</th><th>Items</th><th>Total $</th><th>Disc $</th><th>Net $</th><th>Payment</th><th>Status</th><th>Source</th><th>Notes</th><th>Del</th></tr></thead>
+      <tbody id="bk-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<div class="screen" id="screen-members">
+  <div class="page-header">
+    <div><div class="page-title">Members</div><div class="page-sub" id="mem-count"></div></div>
+    <button class="btn btn-gold" onclick="go('booking')">＋ New membership session</button>
+  </div>
+  <div class="info-box">Members pay <strong>$8/round</strong> (non-members $10). Annual membership fee: <strong>$75</strong>. Member prices apply automatically when their phone number is entered.</div>
+  <div class="metrics" id="mem-metrics"></div>
+  <div id="mem-list"></div>
+</div>
+
+<!-- ALL CUSTOMERS -->
+<div class="screen" id="screen-customers">
+  <div class="page-header">
+    <div><div class="page-title">All customers</div><div class="page-sub" id="cu-count"></div></div>
+    <button class="btn btn-gold" onclick="toggleAddCust(true)">＋ Add customer manually</button>
+  </div>
+  <div id="add-cust-card" class="card" style="display:none">
+    <div class="card-title">Add customer</div>
+    <div class="field-row col2">
+      <div><label>Full name *</label><input id="cu-name" type="text"></div>
+      <div><label>Phone *</label><input id="cu-phone" type="tel" placeholder="03 123 456" style="font-family:'DM Mono',monospace"></div>
+    </div>
+    <div class="field-row col3">
+      <div><label>Email</label><input id="cu-email" type="email"></div>
+      <div><label>Preferred discipline</label>
+        <select id="cu-disc"><option>Trap</option><option>Skeet</option><option>Sporting Clays</option><option>American Trap</option><option>Pistol</option><option>Multiple</option><option>Beginner</option></select>
+      </div>
+      <div><label>Type</label>
+        <select id="cu-type"><option>Regular</option><option>Member</option><option>Corporate</option></select>
+      </div>
+    </div>
+    <div class="field-row" style="grid-template-columns:1fr">
+      <div><label>Notes</label><textarea id="cu-notes"></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="saveCustomer()">Save</button>
+      <button class="btn" onclick="toggleAddCust(false)">Cancel</button>
+    </div>
+  </div>
+  <div class="search-row">
+    <input type="text" id="cu-q" placeholder="Search name or phone..." oninput="renderCustomers()">
+    <select id="cu-type-f" onchange="renderCustomers()"><option value="">All types</option><option>Regular</option><option>Member</option><option>Corporate</option></select>
+    <select id="cu-disc-f" onchange="renderCustomers()"><option value="">All disciplines</option><option>Trap</option><option>Skeet</option><option>Sporting Clays</option><option>American Trap</option><option>Pistol</option><option>Multiple</option><option>Beginner</option></select>
+    <select id="cu-new-f" onchange="renderCustomers()"><option value="">All customers</option><option value="new">New only</option></select>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Name</th><th>Phone</th><th>Type</th><th>Discipline</th><th>Visits</th><th>Spent $</th><th>Last visit</th><th>New?</th><th>Feedback</th><th>Notes</th><th>Action</th></tr></thead>
+      <tbody id="cu-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- FEEDBACK CALLS -->
+<div class="screen" id="screen-feedback">
+  <div class="page-header">
+    <div><div class="page-title">Feedback calls</div><div class="page-sub">New customers to call for feedback. Mark done once called.</div></div>
+  </div>
+  <div class="warn-box">📞 These are first-time customers. Call them within 3 days of their visit. Ask: Was everything okay? What did they enjoy? Would they come back? Any suggestions?</div>
+  <div id="feedback-pending-list"></div>
+  <div style="margin:20px 0 8px;font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em">Completed feedback calls</div>
+  <div id="feedback-done-list"></div>
+</div>
+
+<!-- INCOME -->
+<div class="screen" id="screen-income">
+  <div class="page-header">
+    <div><div class="page-title">Income & revenue</div></div>
+    <button class="btn" onclick="exportIncome()">⤓ Export CSV</button>
+  </div>
+  <div class="metrics" id="inc-metrics"></div>
+  <div class="grid2">
+    <div class="card"><div class="card-title">Revenue by service</div><div id="inc-svc-bars"></div></div>
+    <div class="card"><div class="card-title">Revenue by month</div><div id="inc-month-bars"></div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="card-title" style="padding:14px 18px 0">All sessions</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Items summary</th><th>Subtotal $</th><th>Disc $</th><th>Net $</th><th>Payment</th><th>Status</th></tr></thead>
+      <tbody id="inc-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div class="screen" id="screen-expenses">
+  <div class="page-header">
+    <div><div class="page-title">Expenses</div></div>
+    <button class="btn btn-gold" onclick="showExpForm(true)">＋ Add expense</button>
+  </div>
+  <div id="exp-alert"></div>
+  <div id="exp-form-card" class="card" style="display:none">
+    <div class="card-title">New expense</div>
+    <div class="field-row col3">
+      <div><label>Date *</label><input id="ex-date" type="date"></div>
+      <div><label>Category</label>
+        <select id="ex-cat"><option>Ammunition restock</option><option>Equipment maintenance</option><option>Prizes / trophies</option><option>Staff wages</option><option>Utilities</option><option>Cleaning</option><option>Marketing / printing</option><option>Food & beverage</option><option>Renovation</option><option>Other</option></select>
+      </div>
+      <div><label>Amount ($) *</label><input id="ex-amount" type="number" placeholder="0"></div>
+    </div>
+    <div class="field-row" style="grid-template-columns:1fr">
+      <div><label>Description *</label><input id="ex-desc" type="text" placeholder="e.g. 500 boxes 12-gauge shells from supplier"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="saveExpense()">Save</button>
+      <button class="btn" onclick="showExpForm(false)">Cancel</button>
+    </div>
+  </div>
+  <div class="metrics" id="exp-metrics"></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount $</th><th>Del</th></tr></thead>
+      <tbody id="exp-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- AMMO STOCK -->
+<div class="screen" id="screen-stock">
+  <div class="page-header">
+    <div><div class="page-title">Ammunition stock</div><div class="page-sub">Stock reduces automatically when ammo is sold in a session</div></div>
+    <button class="btn btn-gold" onclick="showStockForm(true)">＋ Add / restock item</button>
+  </div>
+  <div id="stock-alert"></div>
+  <div id="stock-form-card" class="card" style="display:none">
+    <div class="card-title">Add new item or restock existing</div>
+    <div class="field-row col3">
+      <div><label>Item name * (match ammo sold in sessions)</label>
+        <select id="sk-name" style="width:100%">
+          <option value="">— select type —</option>
+          <option value="12-gauge">12-gauge</option>
+          <option value="20-gauge">20-gauge</option>
+          <option value="28-gauge">28-gauge</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div><label>Quantity to add *</label><input id="sk-qty" type="number" placeholder="0" min="0"></div>
+      <div><label>Alert when below</label><input id="sk-low" type="number" placeholder="10" min="0"></div>
+    </div>
+    <div class="field-row col2">
+      <div><label>Unit cost ($)</label><input id="sk-cost" type="number" placeholder="0" step="0.5"></div>
+      <div><label>Notes (supplier, batch, etc.)</label><input id="sk-notes" type="text" placeholder="e.g. From Al-Arz Supplier"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="saveStock()">Save</button>
+      <button class="btn" onclick="showStockForm(false)">Cancel</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Item</th><th>In stock</th><th>Alert at</th><th>Unit cost $</th><th>Stock value $</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
+      <tbody id="stock-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- COMPETITIONS -->
+<div class="screen" id="screen-competitions">
+  <div class="page-header">
+    <div><div class="page-title">Competitions & events</div></div>
+    <button class="btn btn-gold" onclick="showCompForm(true)">＋ New competition</button>
+  </div>
+  <div id="comp-form-card" class="card" style="display:none">
+    <div class="card-title">New competition</div>
+    <div class="field-row col3">
+      <div><label>Name *</label><input id="cp-name" type="text" placeholder="Monthly Trap Championship"></div>
+      <div><label>Date *</label><input id="cp-date" type="date"></div>
+      <div><label>Discipline</label>
+        <select id="cp-disc"><option>Trap</option><option>Skeet</option><option>Sporting Clays</option><option>American Trap</option><option>Pistol</option><option>Mixed</option><option>Ladies only</option><option>Beginner</option></select>
+      </div>
+    </div>
+    <div class="field-row col4">
+      <div><label>Entry fee ($)</label><input id="cp-fee" type="number" placeholder="15"></div>
+      <div><label>Min. participants</label><input id="cp-min" type="number" placeholder="5"></div>
+      <div><label>Max participants</label><input id="cp-max" type="number" placeholder="20"></div>
+      <div><label>Prize value ($)</label><input id="cp-prize" type="number" placeholder="100"></div>
+    </div>
+    <div class="field-row col2">
+      <div><label>Organizer</label><input id="cp-org" type="text" placeholder="Club management"></div>
+      <div><label>Status</label>
+        <select id="cp-status"><option>Upcoming</option><option>Open for registration</option><option>Completed</option><option>Cancelled</option></select>
+      </div>
+    </div>
+    <div class="field-row" style="grid-template-columns:1fr">
+      <div><label>Notes / results / winner</label><textarea id="cp-notes" placeholder="Registered participants, results..."></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="saveComp()">Save</button>
+      <button class="btn" onclick="showCompForm(false)">Cancel</button>
+    </div>
+  </div>
+  <div id="comp-list"></div>
+</div>
+
+<!-- EDIT DATABASE -->
+<div class="screen" id="screen-editdb">
+  <div class="page-header">
+    <div><div class="page-title">Edit database</div><div class="page-sub">Click any value to edit it. Changes save instantly.</div></div>
+  </div>
+  <div class="info-box">Use this to fix mistakes: wrong amount, wrong name, wrong payment status. Every field is editable inline. To completely remove a record, use the Delete button.</div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="btn" id="edtab-sessions" onclick="showEditSection('sessions')">Sessions</button>
+    <button class="btn" id="edtab-customers" onclick="showEditSection('customers')">Customers</button>
+    <button class="btn" id="edtab-stock" onclick="showEditSection('stock')">Ammo stock</button>
+    <button class="btn btn-danger" style="margin-left:auto" onclick="confirmWipe()">⚠ Wipe all data</button>
+  </div>
+  <div id="edit-section-sessions">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Date</th><th>Customer</th><th>Phone</th><th>Items summary</th><th>Total $</th><th>Disc $</th><th>Payment</th><th>Status</th><th>Notes</th><th>Del</th></tr></thead>
+        <tbody id="edit-bk-tbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+  <div id="edit-section-customers" style="display:none">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Type</th><th>Discipline</th><th>Notes</th><th>Del</th></tr></thead>
+        <tbody id="edit-cu-tbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+  <div id="edit-section-stock" style="display:none">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Item</th><th>Qty</th><th>Alert below</th><th>Unit cost $</th><th>Notes</th><th>Del</th></tr></thead>
+        <tbody id="edit-sk-tbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+</div></div><!-- /main /shell -->
+
+<script>
+const KEY='soukhour_v4';
+let db={sessions:[],customers:[],expenses:[],competitions:[],stock:[]};
+// session item format: {service, qty, unitPrice, ammoType?}
+// session: {id, name, phone, date, time, source, items:[], discount, payment, status, notes, createdAt}
+
+function loadDB(){
+  try{const s=localStorage.getItem(KEY);if(s)db=JSON.parse(s);}catch(e){}
+  ['sessions','customers','expenses','competitions','stock'].forEach(k=>{if(!db[k])db[k]=[];});
+}
+function saveDB(){
+  try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){}
+  syncToCloud();
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function today(){return new Date().toISOString().slice(0,10);}
+function fmt$(n){return'$'+Number(n||0).toFixed(0);}
+function fmtDate(d){if(!d)return'–';return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});}
+function initials(n){return(n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function sessionTotal(s){return(s.items||[]).reduce((a,i)=>a+i.unitPrice*i.qty,0);}
+function sessionNet(s){return Math.max(0,sessionTotal(s)-Number(s.discount||0));}
+function sessionSummary(s){return(s.items||[]).map(i=>`${i.qty}×${i.service}`).join(', ');}
+
+// ─── PHONE NORMALISATION ───
+// Strips spaces, dashes, dots. Removes leading +961 or 00961 or 961 if followed by a digit.
+// Lebanese numbers: 03-xxx-xxx → stored as 03xxxxxxx (8 digits) or 07xxxxxxx etc.
+function normalizePhone(raw){
+  let p=(raw||'').replace(/[\s\-\.]/g,'');
+  if(p.startsWith('+961'))p=p.slice(4);
+  else if(p.startsWith('00961'))p=p.slice(5);
+  else if(p.startsWith('961')&&p.length>9)p=p.slice(3);
+  if(p.startsWith('0')&&p.length>8){}  // already local format like 03...
+  else if(!p.startsWith('0')&&p.length===8)p='0'+p; // 3xxxxxxx → 03xxxxxxx
+  return p;
+}
+
+function badge(status){
+  const m={'Confirmed':'b-confirmed','Pending':'b-pending','Cancelled':'b-cancelled','Member':'b-member','Regular':'b-regular','Corporate':'b-corporate','Upcoming':'b-pending','Open for registration':'b-confirmed','Completed':'b-regular'};
+  return`<span class="badge ${m[status]||'b-regular'}">${status}</span>`;
+}
+
+const NAV=['dashboard','booking','bookings','members','customers','feedback','income','expenses','stock','competitions','editdb'];
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const idx=NAV.indexOf(name);
+  if(idx>=0)document.querySelectorAll('.nav-item')[idx].classList.add('active');
+  const r={dashboard:renderDash,bookings:renderBookings,members:renderMembers,customers:renderCustomers,feedback:renderFeedback,income:renderIncome,expenses:renderExpenses,stock:renderStock,competitions:renderComps,editdb:()=>renderEditDB('sessions')};
+  if(r[name])r[name]();
+  updateFeedbackBadge();
+}
+
+function tick(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'2-digit'})+' · '+n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+
+// ─── SESSION STATE ───
+let sessionItems=[];
+let currentIsMember=false;
+
+function lookupCustomer(){
+  const raw=document.getElementById('b-phone').value.trim();
+  const phone=normalizePhone(raw);
+  if(phone.length<5){document.getElementById('cust-profile-area').innerHTML='';document.getElementById('member-hint').style.display='none';currentIsMember=false;return;}
+  const cu=db.customers.find(c=>normalizePhone(c.phone)===phone);
+  if(cu){
+    document.getElementById('b-name').value=cu.name;
+    currentIsMember=cu.type==='Member';
+    document.getElementById('member-hint').style.display=currentIsMember?'block':'none';
+    const visits=cu.visits||0;
+    const spent=cu.spent||0;
+    const isNew=visits===0;
+    document.getElementById('cust-profile-area').innerHTML=`
+      <div class="cust-profile">
+        <div class="member-avatar">${initials(cu.name)}</div>
+        <div class="cust-profile-info">
+          <div class="cust-profile-name">${cu.name} ${currentIsMember?'<span class="badge b-member">★ Member</span>':''} ${isNew?'<span class="badge b-new">NEW</span>':''}</div>
+          <div class="cust-profile-stats">
+            <span class="cust-stat">📅 ${visits} visit${visits!==1?'s':''}</span>
+            <span class="cust-stat">💰 Total spent: ${fmt$(spent)}</span>
+            <span class="cust-stat">🗓 Last visit: ${fmtDate(cu.lastVisit)}</span>
+            <span class="cust-stat">🎯 ${cu.disc||'No discipline set'}</span>
+          </div>
+        </div>
+      </div>`;
+    recalcAllItems();
+  } else {
+    currentIsMember=false;
+    document.getElementById('member-hint').style.display='none';
+    document.getElementById('cust-profile-area').innerHTML='';
+  }
+}
+
+function calcItemPrice(){
+  const sel=document.getElementById('b-service');
+  const opt=sel.options[sel.selectedIndex];
+  if(!opt||!opt.value)return;
+  const p=currentIsMember?Number(opt.dataset.pm||0):Number(opt.dataset.p||0);
+  const qty=Number(document.getElementById('b-qty').value)||1;
+  if(p>0)document.getElementById('b-item-price').value=p;
+}
+
+function addItem(){
+  const svc=document.getElementById('b-service').value;
+  const qty=Number(document.getElementById('b-qty').value)||1;
+  const price=Number(document.getElementById('b-item-price').value||0);
+  if(!svc||!price){alert('Select a service and make sure the price is filled in.');return;}
+  const sel=document.getElementById('b-service');
+  const opt=sel.options[sel.selectedIndex];
+  const ammoType=opt.dataset.ammo||null;
+  sessionItems.push({service:svc,qty,unitPrice:price,ammoType});
+  document.getElementById('b-service').selectedIndex=0;
+  document.getElementById('b-qty').value=1;
+  document.getElementById('b-item-price').value='';
+  renderSessionItems();
+}
+
+function removeItem(idx){sessionItems.splice(idx,1);renderSessionItems();}
+
+function recalcAllItems(){
+  sessionItems=sessionItems.map(item=>{
+    const sel=document.getElementById('b-service');
+    const allOpts=Array.from(document.querySelectorAll('#b-service option'));
+    const opt=allOpts.find(o=>o.value===item.service);
+    if(opt){const p=currentIsMember?Number(opt.dataset.pm||0):Number(opt.dataset.p||0);if(p>0)item.unitPrice=p;}
+    return item;
+  });
+  renderSessionItems();
+}
+
+function renderSessionItems(){
+  const total=sessionItems.reduce((a,i)=>a+i.unitPrice*i.qty,0);
+  document.getElementById('session-total-label').textContent=sessionItems.length?`Total: ${fmt$(total)}`:'';
+  if(!sessionItems.length){document.getElementById('session-items').innerHTML='<div style="color:var(--text3);font-size:13px;padding:8px 0">No items added yet</div>';return;}
+  document.getElementById('session-items').innerHTML=sessionItems.map((i,idx)=>`
+    <div class="item-row">
+      <span class="item-name">${i.qty > 1?i.qty+'× ':''}${i.service}${i.ammoType?' <span style="font-size:11px;color:var(--text3)">('+i.ammoType+')</span>':''}</span>
+      <span class="item-price">${fmt$(i.unitPrice*i.qty)}</span>
+      <button class="btn btn-sm btn-danger" onclick="removeItem(${idx})" style="margin-left:8px">✕</button>
+    </div>`).join('');
+}
+
+function saveSession(){
+  const name=document.getElementById('b-name').value.trim();
+  const phone=normalizePhone(document.getElementById('b-phone').value.trim());
+  const date=document.getElementById('b-date').value;
+  if(!name||!phone||!date){showAlert('bk-alert','Fill in customer name, phone, and date.','alert-error');return;}
+  if(!sessionItems.length){showAlert('bk-alert','Add at least one item to the session.','alert-error');return;}
+  const discount=Number(document.getElementById('b-discount').value||0);
+  const subtotal=sessionItems.reduce((a,i)=>a+i.unitPrice*i.qty,0);
+  const net=Math.max(0,subtotal-discount);
+  const sess={
+    id:'S-'+uid(),name,phone,date,
+    time:document.getElementById('b-time').value,
+    source:document.getElementById('b-source').value,
+    items:JSON.parse(JSON.stringify(sessionItems)),
+    discount,subtotal,net,
+    payment:document.getElementById('b-payment').value,
+    status:document.getElementById('b-status').value,
+    notes:document.getElementById('b-notes').value.trim(),
+    createdAt:new Date().toISOString()
+  };
+  db.sessions.push(sess);
+  upsertCustomer(sess);
+  // deduct ammo stock
+  sessionItems.forEach(item=>{
+    if(item.ammoType&&item.ammoType!=='Other'){
+      const s=db.stock.find(x=>x.name.toLowerCase()===item.ammoType.toLowerCase());
+      if(s)s.qty=Math.max(0,s.qty-item.qty);
+    }
+  });
+  saveDB();
+  showAlert('bk-alert','Session saved!','alert-success');
+  // receipt
+  const cu=db.customers.find(c=>c.phone===phone);
+  const isMem=cu&&cu.type==='Member';
+  document.getElementById('receipt-area').innerHTML=`
+    <div class="receipt">
+      <div style="font-weight:700;margin-bottom:12px;color:var(--gold);font-size:15px">Receipt — ${sess.id}${isMem?' ⭐':''}</div>
+      <div class="receipt-row"><span>Customer</span><span>${name}${isMem?' (Member)':''}</span></div>
+      <div class="receipt-row"><span>Date</span><span>${fmtDate(date)} ${sess.time}</span></div>
+      ${sessionItems.map(i=>`<div class="receipt-row"><span>${i.qty > 1?i.qty+'× ':''}${i.service}</span><span>${fmt$(i.unitPrice*i.qty)}</span></div>`).join('')}
+      <div class="receipt-row"><span>Subtotal</span><span>${fmt$(subtotal)}</span></div>
+      ${discount>0?`<div class="receipt-row"><span>Discount</span><span style="color:var(--red)">-${fmt$(discount)}</span></div>`:''}
+      <div class="receipt-row"><span>Total</span><span>${fmt$(net)}</span></div>
+    </div>`;
+  sessionItems=[];
+  renderSessionItems();
+  updateFeedbackBadge();
+}
+
+function clearSession(){
+  ['b-name','b-phone','b-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('b-date').value=today();
+  document.getElementById('b-time').value='09:00';
+  document.getElementById('b-discount').value=0;
+  document.getElementById('b-service').selectedIndex=0;
+  document.getElementById('b-qty').value=1;
+  document.getElementById('b-item-price').value='';
+  document.getElementById('cust-profile-area').innerHTML='';
+  document.getElementById('member-hint').style.display='none';
+  document.getElementById('receipt-area').innerHTML='';
+  sessionItems=[];currentIsMember=false;
+  renderSessionItems();
+}
+
+function upsertCustomer(sess){
+  const normPhone=normalizePhone(sess.phone);
+  let cu=db.customers.find(c=>normalizePhone(c.phone)===normPhone);
+  const isFirstVisit=!cu;
+  if(!cu){cu={id:'CU-'+uid(),name:sess.name,phone:sess.phone,email:'',disc:'',type:'Regular',notes:'',visits:0,spent:0,lastVisit:'',isNew:true,feedbackDone:false,feedbackNotes:''};db.customers.push(cu);}
+  if(sess.status!=='Cancelled'){
+    cu.visits=(cu.visits||0)+1;
+    cu.spent=(cu.spent||0)+sess.net;
+    if(!cu.lastVisit||sess.date>cu.lastVisit)cu.lastVisit=sess.date;
+  }
+  if(sess.items.some(i=>i.service.includes('Membership')))cu.type='Member';
+  saveDB();
+  updateSuggestions();
+}
+
+function updateSuggestions(){
+  const dl=document.getElementById('cust-suggest');
+  if(dl)dl.innerHTML=db.customers.map(c=>`<option value="${c.name}">`).join('');
+}
+
+function updateFeedbackBadge(){
+  const pending=db.customers.filter(c=>c.isNew&&!c.feedbackDone).length;
+  const b=document.getElementById('feedback-badge');
+  if(pending>0){b.style.display='inline';b.textContent=pending;}else{b.style.display='none';}
+}
+
+// ─── DASHBOARD ───
+function renderDash(){
+  const now=new Date();
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const active=db.sessions.filter(s=>s.status!=='Cancelled');
+  const totalRev=active.reduce((a,s)=>a+s.net,0);
+  const paidRev=active.filter(s=>s.payment!=='Pending / unpaid').reduce((a,s)=>a+s.net,0);
+  const pendingRev=active.filter(s=>s.payment==='Pending / unpaid').reduce((a,s)=>a+s.net,0);
+  const todaySess=db.sessions.filter(s=>s.date===today());
+  const todayRev=todaySess.filter(s=>s.status!=='Cancelled').reduce((a,s)=>a+s.net,0);
+  const members=db.customers.filter(c=>c.type==='Member').length;
+  const newCusts=db.customers.filter(c=>c.isNew&&!c.feedbackDone).length;
+  const lowStock=db.stock.filter(s=>s.qty<=(s.low||0)&&(s.low||0)>0).length;
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric gold"><div class="metric-label">Total revenue</div><div class="metric-value">${fmt$(totalRev)}</div><div class="metric-sub">Net of discounts</div></div>
+    <div class="metric green"><div class="metric-label">Collected</div><div class="metric-value">${fmt$(paidRev)}</div></div>
+    <div class="metric amber"><div class="metric-label">Pending</div><div class="metric-value">${fmt$(pendingRev)}</div></div>
+    <div class="metric"><div class="metric-label">Today</div><div class="metric-value">${fmt$(todayRev)}</div><div class="metric-sub">${todaySess.length} session${todaySess.length!==1?'s':''}</div></div>
+    <div class="metric"><div class="metric-label">Members</div><div class="metric-value" style="color:var(--gold)">${members}</div></div>
+    <div class="metric ${newCusts?'amber':''}"><div class="metric-label">Feedback needed</div><div class="metric-value" style="color:${newCusts?'var(--amber)':'var(--green)'}">${newCusts}</div><div class="metric-sub">${newCusts?'New customers to call':'All called'}</div></div>
+  `;
+  // today list
+  const tl=document.getElementById('today-list');
+  if(!todaySess.length){tl.innerHTML='<div class="empty">No sessions today</div>';}
+  else{tl.innerHTML=todaySess.map(s=>`<div class="today-item"><div><div style="font-weight:600">${s.name}</div><div style="font-size:12px;color:var(--text2)">${s.time||''} · ${sessionSummary(s)}</div></div><div style="text-align:right"><div style="font-weight:600;color:var(--gold)">${fmt$(s.net)}</div>${badge(s.status)}</div></div>`).join('');}
+  // bars
+  const bySvc={};
+  active.forEach(s=>(s.items||[]).forEach(i=>{const k=i.service.split(':')[0].trim();bySvc[k]=(bySvc[k]||0)+i.unitPrice*i.qty;}));
+  const sorted=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxV=sorted[0]?sorted[0][1]:1;
+  document.getElementById('dash-bars').innerHTML=sorted.length?sorted.map(([k,v])=>`<div class="bar-row"><div class="bar-label">${k.length>16?k.slice(0,16)+'…':k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxV*100)}%"></div></div><div class="bar-val">${fmt$(v)}</div></div>`).join(''):'<div class="empty">No data yet</div>';
+  // recent
+  const recent=[...db.sessions].reverse().slice(0,10);
+  document.getElementById('dash-recent').innerHTML=recent.length?recent.map(s=>{
+    const cu=db.customers.find(c=>c.phone===s.phone);
+    const isMem=cu&&cu.type==='Member';
+    const isNew=cu&&cu.isNew;
+    return`<tr><td>${fmtDate(s.date)}</td><td style="font-weight:600">${s.name}</td><td>${isMem?'<span class="badge b-member">★ Member</span>':''} ${isNew?'<span class="badge b-new">NEW</span>':''}</td><td style="font-size:12px;color:var(--text2);max-width:180px">${sessionSummary(s)}</td><td style="color:var(--gold);font-weight:600">${fmt$(s.net)}</td><td style="font-size:12px">${s.payment||''}</td><td>${badge(s.status)}</td></tr>`;
+  }).join(''):'<tr><td colspan="7" class="empty">No sessions yet</td></tr>';
+}
+
+// ─── SESSIONS LIST ───
+function renderBookings(){
+  const q=(document.getElementById('bk-q').value||'').toLowerCase();
+  const fs=document.getElementById('bk-status').value;
+  const fm=document.getElementById('bk-month').value;
+  const months=[...new Set(db.sessions.map(s=>s.date?s.date.slice(0,7):'').filter(Boolean))].sort().reverse();
+  const curM=fm;
+  document.getElementById('bk-month').innerHTML='<option value="">All months</option>'+months.map(m=>{const[y,mo]=m.split('-');const label=new Date(+y,+mo-1).toLocaleString('default',{month:'long',year:'numeric'});return`<option value="${m}"${m===curM?' selected':''}>${label}</option>`;}).join('');
+  let list=[...db.sessions].reverse();
+  if(q)list=list.filter(s=>s.name.toLowerCase().includes(q)||(s.phone&&s.phone.includes(q))||sessionSummary(s).toLowerCase().includes(q));
+  if(fs)list=list.filter(s=>s.status===fs);
+  if(fm)list=list.filter(s=>s.date&&s.date.startsWith(fm));
+  document.getElementById('bk-count').textContent=list.length+' session'+(list.length!==1?'s':'')+' shown';
+  document.getElementById('bk-tbody').innerHTML=list.length?list.map(s=>{
+    const cu=db.customers.find(c=>c.phone===s.phone);
+    const isMem=cu&&cu.type==='Member';
+    return`<tr><td style="white-space:nowrap">${fmtDate(s.date)}</td><td style="font-size:12px">${s.time||'–'}</td><td style="font-weight:600">${s.name}</td><td>${isMem?'<span class="badge b-member">★</span>':''}</td><td style="font-size:12px;color:var(--text2);max-width:160px">${sessionSummary(s)}</td><td style="font-weight:600">${fmt$(s.subtotal||0)}</td><td style="color:var(--red);font-size:12px">${s.discount>0?'-'+fmt$(s.discount):''}</td><td style="color:var(--gold);font-weight:600">${fmt$(s.net)}</td><td style="font-size:12px">${s.payment||''}</td><td>${badge(s.status)}</td><td style="font-size:11px;color:var(--text3)">${s.source||''}</td><td style="font-size:11px;color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.notes||''}</td><td><button class="btn btn-sm btn-danger" onclick="delSession('${s.id}')">Del</button></td></tr>`;
+  }).join(''):'<tr><td colspan="13" class="empty">No sessions found</td></tr>';
+}
+function delSession(id){if(!confirm('Delete session?'))return;db.sessions=db.sessions.filter(s=>s.id!==id);saveDB();renderBookings();}
+
+// ─── MEMBERS ───
+function renderMembers(){
+  const members=db.customers.filter(c=>c.type==='Member');
+  document.getElementById('mem-count').textContent=members.length+' active member'+(members.length!==1?'s':'');
+  const memFees=db.sessions.filter(s=>s.status!=='Cancelled'&&(s.items||[]).some(i=>i.service.includes('Membership'))).length*75;
+  const memRound=db.sessions.filter(s=>{const cu=db.customers.find(c=>c.phone===s.phone);return cu&&cu.type==='Member'&&s.status!=='Cancelled';}).reduce((a,s)=>a+s.net,0);
+  document.getElementById('mem-metrics').innerHTML=`
+    <div class="metric gold"><div class="metric-label">Active members</div><div class="metric-value">${members.length}</div></div>
+    <div class="metric green"><div class="metric-label">Membership fees</div><div class="metric-value">${fmt$(memFees)}</div><div class="metric-sub">@$75 each</div></div>
+    <div class="metric"><div class="metric-label">Member sessions revenue</div><div class="metric-value">${fmt$(memRound)}</div></div>
+    <div class="metric"><div class="metric-label">Rate: member/non</div><div class="metric-value" style="font-size:16px">$8 / $10</div><div class="metric-sub">per round</div></div>
+  `;
+  const ml=document.getElementById('mem-list');
+  if(!members.length){ml.innerHTML='<div class="empty">No members yet. Membership is created automatically when "Membership (annual)" is added to a session.</div>';return;}
+  ml.innerHTML=members.map(c=>`
+    <div class="member-card">
+      <div class="member-avatar">${initials(c.name)}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px">${c.name} <span class="badge b-member">★ Member</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">${c.phone}${c.email?' · '+c.email:''}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">${c.disc||'–'} · ${c.visits||0} visits · ${fmt$(c.spent||0)} total</div>
+        ${c.notes?`<div style="font-size:11px;color:var(--text3);margin-top:3px;font-style:italic">${c.notes}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:12px;color:var(--text2)">Last visit</div>
+        <div style="font-weight:600">${fmtDate(c.lastVisit)}</div>
+        <button class="btn btn-sm btn-danger" style="margin-top:8px" onclick="removeMember('${c.id}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+function removeMember(id){
+  if(!confirm('Remove membership?'))return;
+  const cu=db.customers.find(c=>c.id===id);if(cu)cu.type='Regular';
+  saveDB();renderMembers();
+}
+
+// ─── CUSTOMERS ───
+function toggleAddCust(show){document.getElementById('add-cust-card').style.display=show?'block':'none';}
+function saveCustomer(){
+  const name=document.getElementById('cu-name').value.trim();
+  const phone=normalizePhone(document.getElementById('cu-phone').value.trim());
+  if(!name||!phone){alert('Name and phone required.');return;}
+  let cu=db.customers.find(c=>normalizePhone(c.phone)===phone);
+  if(cu){cu.name=name;cu.email=document.getElementById('cu-email').value.trim();cu.disc=document.getElementById('cu-disc').value;cu.type=document.getElementById('cu-type').value;cu.notes=document.getElementById('cu-notes').value.trim();}
+  else{db.customers.push({id:'CU-'+uid(),name,phone,email:document.getElementById('cu-email').value.trim(),disc:document.getElementById('cu-disc').value,type:document.getElementById('cu-type').value,notes:document.getElementById('cu-notes').value.trim(),visits:0,spent:0,lastVisit:'',isNew:true,feedbackDone:false,feedbackNotes:''});}
+  saveDB();toggleAddCust(false);renderCustomers();
+  ['cu-name','cu-phone','cu-email','cu-notes'].forEach(i=>document.getElementById(i).value='');
+}
+function renderCustomers(){
+  const q=(document.getElementById('cu-q').value||'').toLowerCase();
+  const ft=document.getElementById('cu-type-f').value;
+  const fd=document.getElementById('cu-disc-f').value;
+  const fn=document.getElementById('cu-new-f').value;
+  let list=[...db.customers];
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q));
+  if(ft)list=list.filter(c=>c.type===ft);
+  if(fd)list=list.filter(c=>c.disc===fd);
+  if(fn==='new')list=list.filter(c=>c.isNew);
+  list.sort((a,b)=>(b.spent||0)-(a.spent||0));
+  document.getElementById('cu-count').textContent=list.length+' customer'+(list.length!==1?'s':'')+' · '+db.customers.filter(c=>c.type==='Member').length+' members · '+db.customers.filter(c=>c.isNew&&!c.feedbackDone).length+' new (needs call)';
+  updateSuggestions();
+  document.getElementById('cu-tbody').innerHTML=list.length?list.map(c=>{
+    const isNew=c.isNew&&!c.feedbackDone;
+    return`<tr class="${isNew?'row-new':''}">
+      <td style="font-weight:600">${c.name}${isNew?' <span class="badge b-new">NEW</span>':''}</td>
+      <td style="font-size:12px">${c.phone}</td>
+      <td>${badge(c.type)}</td>
+      <td style="font-size:12px;color:var(--text2)">${c.disc||'–'}</td>
+      <td style="text-align:center;font-weight:600">${c.visits||0}</td>
+      <td style="color:var(--gold);font-weight:600">${fmt$(c.spent||0)}</td>
+      <td style="font-size:12px;color:var(--text2)">${fmtDate(c.lastVisit)}</td>
+      <td>${isNew?'<span style="color:var(--amber);font-weight:600;font-size:12px">📞 Call needed</span>':'<span style="color:var(--green);font-size:12px">✓</span>'}</td>
+      <td style="font-size:11px;color:var(--text2);max-width:100px">${c.feedbackNotes||''}</td>
+      <td style="font-size:11px;color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.notes||''}</td>
+      <td style="white-space:nowrap"><button class="btn btn-sm" onclick="markFeedbackDone('${c.id}')">✓ Called</button> <button class="btn btn-sm btn-danger" onclick="delCust('${c.id}')">Del</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="11" class="empty">No customers yet</td></tr>';
+}
+function markFeedbackDone(id){
+  const cu=db.customers.find(c=>c.id===id);
+  if(!cu)return;
+  const notes=prompt('Feedback notes (optional):','');
+  cu.feedbackDone=true;
+  cu.feedbackNotes=notes||'Called';
+  saveDB();renderCustomers();updateFeedbackBadge();
+}
+function delCust(id){if(!confirm('Delete customer?'))return;db.customers=db.customers.filter(c=>c.id!==id);saveDB();renderCustomers();}
+
+// ─── FEEDBACK ───
+function renderFeedback(){
+  const pending=db.customers.filter(c=>c.isNew&&!c.feedbackDone).sort((a,b)=>(b.lastVisit||'').localeCompare(a.lastVisit||''));
+  const done=db.customers.filter(c=>c.isNew&&c.feedbackDone).sort((a,b)=>(b.lastVisit||'').localeCompare(a.lastVisit||''));
+  const pl=document.getElementById('feedback-pending-list');
+  const dl=document.getElementById('feedback-done-list');
+  pl.innerHTML=pending.length?pending.map(c=>`
+    <div class="feedback-new">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:700;font-size:15px">${c.name}</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px">📞 ${c.phone} · First visit: ${fmtDate(c.lastVisit)} · Spent: ${fmt$(c.spent||0)}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-gold btn-sm" onclick="markFeedbackDonePrompt('${c.id}')">✓ Mark as called</button>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label style="text-transform:none;letter-spacing:0;font-size:12px;font-weight:400">Feedback notes:</label>
+        <input type="text" id="fb-${c.id}" placeholder="e.g. Loved the trap field, will return next week" style="margin-top:4px">
+        <button class="btn btn-sm" style="margin-top:6px" onclick="saveFeedbackNote('${c.id}')">Save note</button>
+      </div>
+    </div>`).join(''):'<div class="empty">No pending feedback calls 🎉</div>';
+  dl.innerHTML=done.length?done.map(c=>`
+    <div class="feedback-done">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-weight:600">${c.name} <span style="color:var(--green);font-size:12px">✓ Called</span></div>
+          <div style="font-size:12px;color:var(--text2)">${c.phone} · Visit: ${fmtDate(c.lastVisit)}</div>
+          ${c.feedbackNotes?`<div style="font-size:12px;color:var(--text2);margin-top:3px;font-style:italic">"${c.feedbackNotes}"</div>`:''}
+        </div>
+      </div>
+    </div>`).join(''):'';
+}
+function markFeedbackDonePrompt(id){
+  const notes=prompt('Feedback / call notes:','');
+  const cu=db.customers.find(c=>c.id===id);
+  if(cu){cu.feedbackDone=true;cu.feedbackNotes=notes||'Called';}
+  saveDB();renderFeedback();updateFeedbackBadge();
+}
+function saveFeedbackNote(id){
+  const cu=db.customers.find(c=>c.id===id);
+  const inp=document.getElementById('fb-'+id);
+  if(cu&&inp)cu.feedbackNotes=inp.value;
+  saveDB();
+}
+
+// ─── INCOME ───
+function renderIncome(){
+  const active=db.sessions.filter(s=>s.status!=='Cancelled');
+  const total=active.reduce((a,s)=>a+s.net,0);
+  const paid=active.filter(s=>s.payment!=='Pending / unpaid').reduce((a,s)=>a+s.net,0);
+  const pending=active.filter(s=>s.payment==='Pending / unpaid').reduce((a,s)=>a+s.net,0);
+  const totalDisc=active.reduce((a,s)=>a+Number(s.discount||0),0);
+  const totalExp=db.expenses.reduce((a,e)=>a+Number(e.amount||0),0);
+  const thisM=new Date().toISOString().slice(0,7);
+  const monthRev=active.filter(s=>s.date&&s.date.startsWith(thisM)).reduce((a,s)=>a+s.net,0);
+  document.getElementById('inc-metrics').innerHTML=`
+    <div class="metric gold"><div class="metric-label">Total revenue</div><div class="metric-value">${fmt$(total)}</div><div class="metric-sub">Net of discounts</div></div>
+    <div class="metric green"><div class="metric-label">Collected</div><div class="metric-value">${fmt$(paid)}</div></div>
+    <div class="metric amber"><div class="metric-label">Pending</div><div class="metric-value">${fmt$(pending)}</div></div>
+    <div class="metric"><div class="metric-label">Discounts given</div><div class="metric-value" style="color:var(--red)">${fmt$(totalDisc)}</div></div>
+    <div class="metric"><div class="metric-label">This month</div><div class="metric-value">${fmt$(monthRev)}</div></div>
+    <div class="metric green"><div class="metric-label">Net profit</div><div class="metric-value" style="color:${total-totalExp>=0?'var(--green)':'var(--red)'}">${fmt$(total-totalExp)}</div><div class="metric-sub">After expenses</div></div>
+  `;
+  const bySvc={};
+  active.forEach(s=>(s.items||[]).forEach(i=>{bySvc[i.service]=(bySvc[i.service]||0)+i.unitPrice*i.qty;}));
+  const svcS=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]);
+  const maxS=svcS[0]?svcS[0][1]:1;
+  document.getElementById('inc-svc-bars').innerHTML=svcS.length?svcS.map(([k,v])=>`<div class="bar-row"><div class="bar-label">${k.length>16?k.slice(0,16)+'…':k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxS*100)}%"></div></div><div class="bar-val">${fmt$(v)}</div></div>`).join(''):'<div class="empty">No data</div>';
+  const byM={};
+  active.forEach(s=>{if(s.date){const m=s.date.slice(0,7);byM[m]=(byM[m]||0)+s.net;}});
+  const mS=Object.entries(byM).sort((a,b)=>a[0].localeCompare(b[0])).slice(-8);
+  const maxM=mS.length?Math.max(...mS.map(x=>x[1])):1;
+  document.getElementById('inc-month-bars').innerHTML=mS.length?mS.map(([k,v])=>{const[yr,mo]=k.split('-');const l=new Date(+yr,+mo-1).toLocaleString('default',{month:'short'})+' '+yr.slice(2);return`<div class="bar-row"><div class="bar-label">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxM*100)}%"></div></div><div class="bar-val">${fmt$(v)}</div></div>`;}).join(''):'<div class="empty">No monthly data</div>';
+  document.getElementById('inc-tbody').innerHTML=[...db.sessions].reverse().map(s=>`<tr><td style="white-space:nowrap">${fmtDate(s.date)}</td><td style="font-weight:600">${s.name}</td><td style="font-size:12px;color:var(--text2)">${sessionSummary(s)}</td><td>${fmt$(s.subtotal||0)}</td><td style="color:var(--red)">${s.discount>0?'-'+fmt$(s.discount):''}</td><td style="font-weight:600;color:var(--gold)">${fmt$(s.net)}</td><td style="font-size:12px">${s.payment||''}</td><td>${badge(s.status)}</td></tr>`).join('');
+}
+function exportIncome(){
+  const rows=[['Date','Customer','Phone','Items','Subtotal','Discount','Net','Payment','Status','Source','Notes']];
+  db.sessions.forEach(s=>rows.push([s.date,s.name,s.phone,sessionSummary(s),s.subtotal||0,s.discount||0,s.net,s.payment,s.status,s.source,s.notes]));
+  dlCSV(rows,'soukhour_income_'+today()+'.csv');
+}
+
+// ─── EXPENSES ───
+function showExpForm(show){document.getElementById('exp-form-card').style.display=show?'block':'none';if(show)document.getElementById('ex-date').value=today();}
+function saveExpense(){
+  const date=document.getElementById('ex-date').value;
+  const amount=document.getElementById('ex-amount').value;
+  const desc=document.getElementById('ex-desc').value.trim();
+  if(!date||!amount||!desc){showAlert('exp-alert','Fill in date, amount, description.','alert-error');return;}
+  db.expenses.push({id:'EX-'+uid(),date,cat:document.getElementById('ex-cat').value,amount:Number(amount),desc,createdAt:new Date().toISOString()});
+  saveDB();showExpForm(false);renderExpenses();
+  ['ex-amount','ex-desc'].forEach(i=>document.getElementById(i).value='');
+}
+function renderExpenses(){
+  const total=db.expenses.reduce((a,e)=>a+Number(e.amount||0),0);
+  const thisM=new Date().toISOString().slice(0,7);
+  const monthExp=db.expenses.filter(e=>e.date&&e.date.startsWith(thisM)).reduce((a,e)=>a+Number(e.amount||0),0);
+  const byCat={};db.expenses.forEach(e=>{byCat[e.cat]=(byCat[e.cat]||0)+Number(e.amount||0);});
+  const topCat=Object.entries(byCat).sort((a,b)=>b[1]-a[1])[0];
+  const activeRev=db.sessions.filter(s=>s.status!=='Cancelled').reduce((a,s)=>a+s.net,0);
+  document.getElementById('exp-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value" style="color:var(--red)">${fmt$(total)}</div></div>
+    <div class="metric"><div class="metric-label">This month</div><div class="metric-value">${fmt$(monthExp)}</div></div>
+    <div class="metric"><div class="metric-label">Biggest category</div><div class="metric-value" style="font-size:14px">${topCat?topCat[0]:'–'}</div><div class="metric-sub">${topCat?fmt$(topCat[1]):''}</div></div>
+    <div class="metric green"><div class="metric-label">Net profit</div><div class="metric-value" style="color:${activeRev-total>=0?'var(--green)':'var(--red)'}">${fmt$(activeRev-total)}</div></div>
+  `;
+  document.getElementById('exp-tbody').innerHTML=db.expenses.length?[...db.expenses].reverse().map(e=>`<tr><td>${fmtDate(e.date)}</td><td><span class="badge b-regular">${e.cat}</span></td><td>${e.desc}</td><td style="color:var(--red);font-weight:600">${fmt$(e.amount)}</td><td><button class="btn btn-sm btn-danger" onclick="delExp('${e.id}')">Del</button></td></tr>`).join(''):'<tr><td colspan="5" class="empty">No expenses yet</td></tr>';
+}
+function delExp(id){if(!confirm('Delete?'))return;db.expenses=db.expenses.filter(e=>e.id!==id);saveDB();renderExpenses();}
+
+// ─── STOCK ───
+function showStockForm(show){document.getElementById('stock-form-card').style.display=show?'block':'none';updateSuggestions();}
+function saveStock(){
+  const name=document.getElementById('sk-name').value.trim();
+  const qty=document.getElementById('sk-qty').value;
+  if(!name||qty===''){showAlert('stock-alert','Select an item and enter quantity.','alert-error');return;}
+  const ex=db.stock.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(ex){ex.qty+=Number(qty);ex.low=Number(document.getElementById('sk-low').value||ex.low||0);ex.cost=Number(document.getElementById('sk-cost').value||ex.cost||0);ex.notes=document.getElementById('sk-notes').value||ex.notes;}
+  else{db.stock.push({id:'SK-'+uid(),name,qty:Number(qty),low:Number(document.getElementById('sk-low').value||0),cost:Number(document.getElementById('sk-cost').value||0),notes:document.getElementById('sk-notes').value.trim()});}
+  saveDB();showStockForm(false);renderStock();
+  ['sk-qty','sk-low','sk-cost','sk-notes'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('sk-name').selectedIndex=0;
+}
+function renderStock(){
+  document.getElementById('stock-tbody').innerHTML=db.stock.length?db.stock.map(s=>{
+    const isLow=s.qty===0||s.qty<=(s.low||0)&&(s.low||0)>0;
+    const cls=s.qty===0?'stock-low':s.qty<=(s.low||0)&&(s.low||0)>0?'stock-warn':'stock-ok';
+    const txt=s.qty===0?'⚠ OUT OF STOCK':s.qty<=(s.low||0)&&(s.low||0)>0?'⚠ Low — restock':'✓ In stock';
+    return`<tr${isLow?' style="background:var(--amber-bg)"':''}>
+      <td style="font-weight:600">${s.name}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700" class="${cls}">${s.qty}</td>
+      <td style="font-size:12px;color:var(--text2)">${s.low||'–'}</td>
+      <td>${s.cost>0?fmt$(s.cost):'–'}</td>
+      <td>${s.cost>0?fmt$(s.cost*s.qty):'–'}</td>
+      <td class="${cls}" style="font-size:11px;font-weight:700">${txt}</td>
+      <td style="font-size:11px;color:var(--text2)">${s.notes||''}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-success" onclick="adj('${s.id}',1)">+1</button>
+        <button class="btn btn-sm btn-danger" onclick="adj('${s.id}',-1)">-1</button>
+        <button class="btn btn-sm btn-danger" onclick="delStock('${s.id}')">Del</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8" class="empty">No stock items. Add ammunition inventory above. Items named e.g. "12-gauge (box 25)" will deduct automatically when sold in a session.</td></tr>';
+}
+function adj(id,d){const s=db.stock.find(x=>x.id===id);if(s){s.qty=Math.max(0,s.qty+d);saveDB();renderStock();}}
+function delStock(id){if(!confirm('Delete?'))return;db.stock=db.stock.filter(s=>s.id!==id);saveDB();renderStock();}
+
+// ─── COMPETITIONS ───
+function showCompForm(show){document.getElementById('comp-form-card').style.display=show?'block':'none';if(show)document.getElementById('cp-date').value=today();}
+function saveComp(){
+  const name=document.getElementById('cp-name').value.trim();
+  const date=document.getElementById('cp-date').value;
+  if(!name||!date){alert('Name and date required.');return;}
+  db.competitions.push({id:'CP-'+uid(),name,date,disc:document.getElementById('cp-disc').value,fee:Number(document.getElementById('cp-fee').value||0),minP:Number(document.getElementById('cp-min').value||0),max:document.getElementById('cp-max').value,prize:Number(document.getElementById('cp-prize').value||0),org:document.getElementById('cp-org').value.trim(),status:document.getElementById('cp-status').value,notes:document.getElementById('cp-notes').value.trim(),createdAt:new Date().toISOString()});
+  saveDB();showCompForm(false);renderComps();
+  ['cp-name','cp-fee','cp-min','cp-max','cp-prize','cp-org','cp-notes'].forEach(i=>document.getElementById(i).value='');
+}
+function renderComps(){
+  const cl=document.getElementById('comp-list');
+  const list=[...db.competitions].reverse();
+  if(!list.length){cl.innerHTML='<div class="empty">No competitions yet.</div>';return;}
+  cl.innerHTML=list.map(c=>{
+    const minFee=c.minP>0?`Min. ${c.minP} participants to run`:'No minimum set';
+    const feeTotal=c.minP>0&&c.fee>0?` · Min. revenue if run: ${fmt$(c.minP*c.fee)}`:'';
+    return`<div class="comp-card">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px">${c.name}</div>
+        <div style="font-size:12px;color:var(--text2)">${fmtDate(c.date)} · ${c.disc} · Organizer: ${c.org||'–'}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Entry: ${fmt$(c.fee)} · Prize: ${fmt$(c.prize)} · Max: ${c.max||'–'}</div>
+        <div style="font-size:12px;margin-top:4px;color:${c.minP?'var(--amber)':'var(--text3)'}">⚑ ${minFee}${feeTotal}</div>
+        ${c.notes?`<div style="font-size:12px;color:var(--text3);margin-top:6px;font-style:italic">${c.notes}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:16px;flex-shrink:0">
+        ${badge(c.status)}
+        <button class="btn btn-sm btn-danger" onclick="delComp('${c.id}')">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function delComp(id){if(!confirm('Delete?'))return;db.competitions=db.competitions.filter(c=>c.id!==id);saveDB();renderComps();}
+
+// ─── EDIT DATABASE ───
+function showEditSection(sec){
+  ['sessions','customers','stock'].forEach(s=>{
+    document.getElementById('edit-section-'+s).style.display=s===sec?'block':'none';
+    const b=document.getElementById('edtab-'+s);if(b)b.className=s===sec?'btn btn-gold':'btn';
+  });
+  renderEditDB(sec);
+}
+function renderEditDB(sec){
+  if(sec==='sessions'){
+    document.getElementById('edit-bk-tbody').innerHTML=[...db.sessions].reverse().map(s=>`<tr>
+      <td><input class="edit-input" value="${s.date||''}" onchange="ef('sessions','${s.id}','date',this.value)"></td>
+      <td><input class="edit-input" value="${(s.name||'').replace(/"/g,'&quot;')}" onchange="ef('sessions','${s.id}','name',this.value)"></td>
+      <td><input class="edit-input" value="${s.phone||''}" onchange="ef('sessions','${s.id}','phone',this.value)"></td>
+      <td style="font-size:11px;color:var(--text2)">${sessionSummary(s)}</td>
+      <td><input class="edit-input" type="number" value="${s.subtotal||0}" style="width:70px" onchange="ef('sessions','${s.id}','subtotal',Number(this.value));ef('sessions','${s.id}','net',Math.max(0,Number(this.value)-Number(s.discount||0)))"></td>
+      <td><input class="edit-input" type="number" value="${s.discount||0}" style="width:60px" onchange="ef('sessions','${s.id}','discount',Number(this.value))"></td>
+      <td><select class="edit-input" style="width:130px" onchange="ef('sessions','${s.id}','payment',this.value)"><option${s.payment==='Cash'?' selected':''}>Cash</option><option${s.payment==='OMT'?' selected':''}>OMT</option><option${s.payment==='Whish Money'?' selected':''}>Whish Money</option><option${s.payment==='Bank transfer'?' selected':''}>Bank transfer</option><option${s.payment==='Pending / unpaid'?' selected':''}>Pending / unpaid</option></select></td>
+      <td><select class="edit-input" style="width:110px" onchange="ef('sessions','${s.id}','status',this.value)"><option${s.status==='Confirmed'?' selected':''}>Confirmed</option><option${s.status==='Pending'?' selected':''}>Pending</option><option${s.status==='Cancelled'?' selected':''}>Cancelled</option></select></td>
+      <td><input class="edit-input" value="${(s.notes||'').replace(/"/g,'&quot;')}" onchange="ef('sessions','${s.id}','notes',this.value)"></td>
+      <td><button class="btn btn-sm btn-danger" onclick="delSession('${s.id}');renderEditDB('sessions')">Del</button></td>
+    </tr>`).join('')||'<tr><td colspan="10" class="empty">No sessions</td></tr>';
+  }
+  if(sec==='customers'){
+    document.getElementById('edit-cu-tbody').innerHTML=db.customers.map(c=>`<tr>
+      <td><input class="edit-input" value="${(c.name||'').replace(/"/g,'&quot;')}" onchange="ef('customers','${c.id}','name',this.value)"></td>
+      <td><input class="edit-input" value="${c.phone||''}" onchange="ef('customers','${c.id}','phone',this.value)"></td>
+      <td><input class="edit-input" value="${c.email||''}" onchange="ef('customers','${c.id}','email',this.value)"></td>
+      <td><select class="edit-input" style="width:100px" onchange="ef('customers','${c.id}','type',this.value)"><option${c.type==='Regular'?' selected':''}>Regular</option><option${c.type==='Member'?' selected':''}>Member</option><option${c.type==='Corporate'?' selected':''}>Corporate</option></select></td>
+      <td><select class="edit-input" style="width:130px" onchange="ef('customers','${c.id}','disc',this.value)"><option${c.disc==='Trap'?' selected':''}>Trap</option><option${c.disc==='Skeet'?' selected':''}>Skeet</option><option${c.disc==='Sporting Clays'?' selected':''}>Sporting Clays</option><option${c.disc==='American Trap'?' selected':''}>American Trap</option><option${c.disc==='Pistol'?' selected':''}>Pistol</option><option${c.disc==='Multiple'?' selected':''}>Multiple</option><option${c.disc==='Beginner'?' selected':''}>Beginner</option></select></td>
+      <td><input class="edit-input" value="${(c.notes||'').replace(/"/g,'&quot;')}" onchange="ef('customers','${c.id}','notes',this.value)"></td>
+      <td><button class="btn btn-sm btn-danger" onclick="delCust('${c.id}');renderEditDB('customers')">Del</button></td>
+    </tr>`).join('')||'<tr><td colspan="7" class="empty">No customers</td></tr>';
+  }
+  if(sec==='stock'){
+    document.getElementById('edit-sk-tbody').innerHTML=db.stock.map(s=>`<tr>
+      <td><input class="edit-input" value="${s.name||''}" onchange="ef('stock','${s.id}','name',this.value)"></td>
+      <td><input class="edit-input" type="number" value="${s.qty||0}" style="width:70px" onchange="ef('stock','${s.id}','qty',Number(this.value))"></td>
+      <td><input class="edit-input" type="number" value="${s.low||0}" style="width:70px" onchange="ef('stock','${s.id}','low',Number(this.value))"></td>
+      <td><input class="edit-input" type="number" value="${s.cost||0}" style="width:70px" onchange="ef('stock','${s.id}','cost',Number(this.value))"></td>
+      <td><input class="edit-input" value="${s.notes||''}" onchange="ef('stock','${s.id}','notes',this.value)"></td>
+      <td><button class="btn btn-sm btn-danger" onclick="delStock('${s.id}');renderEditDB('stock')">Del</button></td>
+    </tr>`).join('')||'<tr><td colspan="6" class="empty">No stock</td></tr>';
+  }
+}
+function ef(col,id,field,value){const item=db[col].find(x=>x.id===id);if(item){item[field]=value;saveDB();}}
+
+function confirmWipe(){
+  const c=prompt('Type DELETE to wipe all data:');
+  if(c==='DELETE'){db={sessions:[],customers:[],expenses:[],competitions:[],stock:[]};saveDB();alert('All data wiped.');go('dashboard');}
+}
+
+// ─── EXPORT ───
+function exportAll(){
+  const rows=[['Date','Customer','Phone','Items','Subtotal','Discount','Net','Payment','Status','Source','Notes']];
+  db.sessions.forEach(s=>rows.push([s.date,s.name,s.phone,sessionSummary(s),s.subtotal||0,s.discount||0,s.net,s.payment,s.status,s.source,s.notes]));
+  dlCSV(rows,'soukhour_all_'+today()+'.csv');
+}
+function dlCSV(rows,fn){
+  const csv=rows.map(r=>r.map(c=>'"'+(String(c||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=fn;a.click();
+}
+function showAlert(id,msg,cls){const el=document.getElementById(id);el.innerHTML=`<div class="alert ${cls}">${msg}</div>`;setTimeout(()=>{el.innerHTML='';},4000);}
+
+// ─── CLOUD SYNC (owner phone dashboard) ───
+// Uses jsonbin.io — free, no account needed for reads, tiny writes.
+// BIN_ID and OWNER_PIN are stored in localStorage so employees never see them in code.
+const SYNC_KEY='soukhour_sync_cfg';
+function getSyncCfg(){try{return JSON.parse(localStorage.getItem(SYNC_KEY)||'{}');}catch(e){return{};}}
+function saveSyncCfg(cfg){localStorage.setItem(SYNC_KEY,JSON.stringify(cfg));}
+
+async function syncToCloud(){
+  const cfg=getSyncCfg();
+  if(!cfg.binId||!cfg.apiKey)return; // not configured yet — silent
+  try{
+    await fetch(`https://api.jsonbin.io/v3/b/${cfg.binId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':cfg.apiKey,'X-Bin-Private':'false'},
+      body:JSON.stringify({ts:Date.now(),sessions:db.sessions,customers:db.customers,expenses:db.expenses,stock:db.stock})
+    });
+  }catch(e){/* silent — no internet? just skip */}
+}
+
+function showSyncSetup(){
+  const cfg=getSyncCfg();
+  const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:12px;padding:28px 32px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.18)">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">Owner phone sync setup</div>
+      <div style="font-size:13px;color:#666;margin-bottom:20px">Set this up once. Employees never see this screen. After setup, every saved session is pushed to the cloud so you can view it on your phone.</div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">JSONBin Bin ID</label>
+        <input id="sync-bin" type="text" value="${cfg.binId||''}" placeholder="e.g. 6650a3f1acd3cb34a82f1234" style="width:100%;padding:8px 11px;border:1px solid #ccc;border-radius:8px;font-size:13px">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">JSONBin Master Key</label>
+        <input id="sync-key" type="password" value="${cfg.apiKey||''}" placeholder="$2a$10$..." style="width:100%;padding:8px 11px;border:1px solid #ccc;border-radius:8px;font-size:13px">
+      </div>
+      <div style="font-size:12px;color:#888;background:#f5f5f0;border-radius:8px;padding:10px 14px;margin-bottom:18px;line-height:1.6">
+        <strong>How to get these:</strong><br>
+        1. Go to <strong>jsonbin.io</strong> and create a free account<br>
+        2. Create a new bin (any JSON content)<br>
+        3. Copy the <strong>Bin ID</strong> from the URL<br>
+        4. Go to API Keys → copy your <strong>Master Key</strong><br>
+        Then open <strong>soukhour_owner.html</strong> on your phone and enter your PIN.
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="saveSyncSetup()" style="flex:1;padding:10px;background:#8a6a1e;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Save & sync now</button>
+        <button onclick="document.getElementById('sync-modal').remove()" style="padding:10px 16px;border:1px solid #ccc;border-radius:8px;cursor:pointer;font-size:13px">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+  const div=document.createElement('div');div.id='sync-modal';div.innerHTML=html;document.body.appendChild(div);
+}
+
+function saveSyncSetup(){
+  const binId=document.getElementById('sync-bin').value.trim();
+  const apiKey=document.getElementById('sync-key').value.trim();
+  if(!binId||!apiKey){alert('Both fields required.');return;}
+  saveSyncCfg({binId,apiKey});
+  document.getElementById('sync-modal').remove();
+  syncToCloud().then(()=>alert('Setup saved! Now open soukhour_owner.html on your phone.'));
+}
+
+// ─── INIT ───
+loadDB();
+document.getElementById('b-date').value=today();
+renderDash();
+renderSessionItems();
+updateSuggestions();
+updateFeedbackBadge();
+tick();setInterval(tick,60000);
+</script>
+</body>
+</html>
